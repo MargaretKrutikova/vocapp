@@ -1,15 +1,22 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
 
 generator client {
     provider = "prisma-client-js"
 }
 
-datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+type VocItem {
+    value    String
+    language String
 }
 
-model Example {
-    id String @id @default(cuid())
+model VocValue {
+    id           String    @id @default(auto()) @map("_id") @db.ObjectId
+    value        String
+    language     String
+    translations VocItem[]
+    explanations VocItem[]
+    usages       VocItem[]
 }

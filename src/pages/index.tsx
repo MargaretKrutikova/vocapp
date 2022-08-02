@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
+import { useState } from "react";
 
 type TechnologyCardProps = {
   name: string;
@@ -9,7 +10,14 @@ type TechnologyCardProps = {
 };
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
+  const {
+    data: words,
+    error,
+    isLoading,
+  } = trpc.useQuery(["vocabulary.getAll"]);
+  const { mutate: addWord } = trpc.useMutation(["vocabulary.add"]);
+
+  const [word, setWord] = useState("");
 
   return (
     <>
@@ -46,8 +54,26 @@ const Home: NextPage = () => {
             documentation="https://trpc.io/"
           />
         </div>
-        <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
+        <div className="pt-6 text-2xl text-violet-500 flex-col flex justify-center items-center w-full">
+          {words ? words.map((w) => <div key={w.id}>{w.value}</div>) : null}
+        </div>
+        <div>
+          <input
+            className="
+                form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
+                border border-solid border-gray-300 rounded
+                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+              "
+            placeholder="Word or phrase"
+            value={word}
+            onChange={(e) => setWord(() => e.target.value)}
+          />
+          <button
+            className="bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={() => addWord({ value: word })}
+          >
+            Add word
+          </button>
         </div>
       </main>
     </>
