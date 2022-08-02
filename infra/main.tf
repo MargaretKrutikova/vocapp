@@ -137,6 +137,7 @@ resource "azurerm_app_service" "vocappservice" {
 
   app_settings = {
     "DeployDate"                      = timestamp()
+    "DATABASE_URL"                    = azurerm_cosmosdb_account.cosmosaccount.connection_strings[0]
     "MongoSettings__ConnectionString" = azurerm_cosmosdb_account.cosmosaccount.connection_strings[0]
     "MongoSettings__DatabaseName"     = var.db_name
     "MongoSettings__CollectionName"   = var.collection_name
