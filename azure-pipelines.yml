@@ -78,8 +78,8 @@ stages:
                 failOnStandardError: true
                 azureSubscription: $(azureSubscription)
                 scriptType: bash
-                workingDirectory: $(Build.SourcesDirectory)/infra
-                scriptPath: $(Build.SourcesDirectory)/infra/terraform_init.sh
+                workingDirectory: $(System.DefaultWorkingDirectory)/infra
+                scriptPath: $(System.DefaultWorkingDirectory)/infra/terraform_init.sh
                 
             - task: AzureCLI@2
               name: terraform_deploy
@@ -88,8 +88,8 @@ stages:
                 azureSubscription: $(azureSubscription)
                 addSpnToEnvironment: true
                 scriptType: bash
-                workingDirectory: $(Build.SourcesDirectory)/infra
-                scriptPath: $(Build.SourcesDirectory)/infra/deploy.sh
+                workingDirectory: $(System.DefaultWorkingDirectory)/infra
+                scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
                 arguments: |
                   $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
     
