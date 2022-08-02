@@ -63,6 +63,8 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+      - download: current
+        artifact: drop
       - task: TerraformInstaller@0
         displayName: Install Terraform
         inputs:
@@ -88,7 +90,7 @@ stages:
           workingDirectory: $(System.DefaultWorkingDirectory)/infra
           scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
           arguments: |
-            $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+            $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
     
     # - task: AzureWebApp@1
     #   displayName: 'Azure Web App Deploy: vocwebapp'
