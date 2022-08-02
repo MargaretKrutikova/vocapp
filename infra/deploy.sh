@@ -23,4 +23,4 @@ az webapp deploy \
     --resource-group "VocAppGroup" \
     --name "vocwebapp" \
     --type=zip \
-    --src-path packaged.zip
+    --src-path $PUBLISH_FILE
