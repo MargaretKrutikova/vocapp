@@ -38,3 +38,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# terraform
+.terraform
+.terraform.*
+*.tfplan
