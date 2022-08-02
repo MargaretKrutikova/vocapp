@@ -128,6 +128,10 @@ resource "azurerm_app_service_plan" "vocapp" {
   }
 }
 
+locals {
+  con = split("?", azurerm_cosmosdb_account.cosmosaccount.connection_strings[0])
+}
+
 resource "azurerm_app_service" "vocappservice" {
   name                = var.webapp_name
   location            = azurerm_resource_group.vocappgroup.location
@@ -137,7 +141,7 @@ resource "azurerm_app_service" "vocappservice" {
 
   app_settings = {
     "DeployDate"                      = timestamp()
-    "DATABASE_URL"                    = azurerm_cosmosdb_account.cosmosaccount.connection_strings[0]
+    "DATABASE_URL"                    = format("%s%s?%s", local.con[0], var.db_name, local.con[1])
     "MongoSettings__ConnectionString" = azurerm_cosmosdb_account.cosmosaccount.connection_strings[0]
     "MongoSettings__DatabaseName"     = var.db_name
     "MongoSettings__CollectionName"   = var.collection_name
