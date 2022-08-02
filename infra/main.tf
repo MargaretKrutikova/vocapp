@@ -7,7 +7,7 @@ variable "db_name" {
 }
 
 variable "collection_name" {
-  default = "VocCollection"
+  default = "VocValue"
 }
 
 # providers
