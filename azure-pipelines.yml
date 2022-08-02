@@ -59,10 +59,9 @@ stages:
   jobs:
   - job: Deploy
     displayName: Deploy
-    environment: $(environmentName)
     pool:
       vmImage: $(vmImageName)
-    
+
     steps:
       - task: TerraformInstaller@0
         displayName: Install Terraform
