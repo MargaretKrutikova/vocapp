@@ -145,6 +145,6 @@ resource "azurerm_app_service" "vocappservice" {
   site_config {
     linux_fx_version          = "NODE|16-lts"
     use_32_bit_worker_process = true
-    app_command_line          = "node ./build/lib/index.js"
+    app_command_line          = "node ./packaged/server.js"
   }
 }

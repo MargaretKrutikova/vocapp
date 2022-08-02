@@ -19,8 +19,8 @@ terraform plan --out=main.tfplan
 
 terraform apply main.tfplan
 
-# az webapp deploy \
-#     --resource-group "VocAppGroup" \
-#     --name "vocwebapp" \
-#     --type=zip \
-#     --src-path $PUBLISH_FILE
+az webapp deploy \
+    --resource-group "VocAppGroup" \
+    --name "vocwebapp" \
+    --type=zip \
+    --src-path packaged.zip
