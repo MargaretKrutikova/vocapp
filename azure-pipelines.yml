@@ -57,41 +57,39 @@ stages:
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - deployment: Deploy
+  - job: Deploy
     displayName: Deploy
     environment: $(environmentName)
     pool:
       vmImage: $(vmImageName)
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - task: TerraformInstaller@0
-              displayName: Install Terraform
-              inputs:
-                terraformVersion: "1.2.6"
-            
-            - task: AzureCLI@2
-              name: terraform_init
-              displayName: "terraform init"
-              inputs:
-                failOnStandardError: true
-                azureSubscription: $(azureSubscription)
-                scriptType: bash
-                workingDirectory: $(System.DefaultWorkingDirectory)/infra
-                scriptPath: $(System.DefaultWorkingDirectory)/infra/terraform_init.sh
-                
-            - task: AzureCLI@2
-              name: terraform_deploy
-              displayName: Build and deploy with Terraform
-              inputs:
-                azureSubscription: $(azureSubscription)
-                addSpnToEnvironment: true
-                scriptType: bash
-                workingDirectory: $(System.DefaultWorkingDirectory)/infra
-                scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
-                arguments: |
-                  $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    
+    steps:
+      - task: TerraformInstaller@0
+        displayName: Install Terraform
+        inputs:
+          terraformVersion: "1.2.6"
+      
+      - task: AzureCLI@2
+        name: terraform_init
+        displayName: "terraform init"
+        inputs:
+          failOnStandardError: true
+          azureSubscription: $(azureSubscription)
+          scriptType: bash
+          workingDirectory: $(System.DefaultWorkingDirectory)/infra
+          scriptPath: $(System.DefaultWorkingDirectory)/infra/terraform_init.sh
+          
+      - task: AzureCLI@2
+        name: terraform_deploy
+        displayName: Build and deploy with Terraform
+        inputs:
+          azureSubscription: $(azureSubscription)
+          addSpnToEnvironment: true
+          scriptType: bash
+          workingDirectory: $(System.DefaultWorkingDirectory)/infra
+          scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
+          arguments: |
+            $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
     
     # - task: AzureWebApp@1
     #   displayName: 'Azure Web App Deploy: vocwebapp'
