@@ -62,33 +62,36 @@ stages:
     environment: $(environmentName)
     pool:
       vmImage: $(vmImageName)
-    steps:
-      - task: TerraformInstaller@0
-        displayName: Install Terraform
-        inputs:
-          terraformVersion: "1.2.6"
-      
-      - task: AzureCLI@2
-        name: terraform_init
-        displayName: "terraform init"
-        inputs:
-          failOnStandardError: true
-          azureSubscription: $(azureSubscription)
-          scriptType: bash
-          workingDirectory: $(Build.SourcesDirectory)/infra
-          scriptPath: $(Build.SourcesDirectory)/infra/terraform_init.sh
-          
-      - task: AzureCLI@2
-        name: terraform_deploy
-        displayName: Build and deploy with Terraform
-        inputs:
-          azureSubscription: $(azureSubscription)
-          addSpnToEnvironment: true
-          scriptType: bash
-          workingDirectory: $(Build.SourcesDirectory)/infra
-          scriptPath: $(Build.SourcesDirectory)/infra/deploy.sh
-          arguments: |
-            $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: TerraformInstaller@0
+              displayName: Install Terraform
+              inputs:
+                terraformVersion: "1.2.6"
+            
+            - task: AzureCLI@2
+              name: terraform_init
+              displayName: "terraform init"
+              inputs:
+                failOnStandardError: true
+                azureSubscription: $(azureSubscription)
+                scriptType: bash
+                workingDirectory: $(Build.SourcesDirectory)/infra
+                scriptPath: $(Build.SourcesDirectory)/infra/terraform_init.sh
+                
+            - task: AzureCLI@2
+              name: terraform_deploy
+              displayName: Build and deploy with Terraform
+              inputs:
+                azureSubscription: $(azureSubscription)
+                addSpnToEnvironment: true
+                scriptType: bash
+                workingDirectory: $(Build.SourcesDirectory)/infra
+                scriptPath: $(Build.SourcesDirectory)/infra/deploy.sh
+                arguments: |
+                  $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
     
     # - task: AzureWebApp@1
     #   displayName: 'Azure Web App Deploy: vocwebapp'
