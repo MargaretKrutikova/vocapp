@@ -18,6 +18,7 @@ const Home: NextPage = () => {
   const { mutate: addWord } = trpc.useMutation(["vocabulary.add"]);
 
   const [word, setWord] = useState("");
+  const [tenant, setTenant] = useState("test");
 
   return (
     <>
@@ -55,9 +56,25 @@ const Home: NextPage = () => {
           />
         </div>
         <div className="pt-6 text-2xl text-violet-500 flex-col flex justify-center items-center w-full">
-          {words ? words.map((w) => <div key={w.id}>{w.value}</div>) : null}
+          {words
+            ? words.map((w) => (
+                <div key={w.id}>
+                  {w.value} ({w.tenant})
+                </div>
+              ))
+            : null}
         </div>
         <div>
+          <input
+            className="
+                form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
+                border border-solid border-gray-300 rounded
+                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+              "
+            placeholder="Tenant"
+            value={tenant}
+            onChange={(e) => setTenant(() => e.target.value)}
+          />
           <input
             className="
                 form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
