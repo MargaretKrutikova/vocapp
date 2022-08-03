@@ -1,25 +1,13 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
-import { useState } from "react";
 
 type TechnologyCardProps = {
   name: string;
   description: string;
-  documentation: string;
+  link: string;
 };
 
 const Home: NextPage = () => {
-  const {
-    data: words,
-    error,
-    isLoading,
-  } = trpc.useQuery(["vocabulary.getAll"]);
-  const { mutate: addWord } = trpc.useMutation(["vocabulary.add"]);
-
-  const [word, setWord] = useState("");
-  const [tenant, setTenant] = useState("test");
-
   return (
     <>
       <Head>
@@ -34,85 +22,24 @@ const Home: NextPage = () => {
         </h1>
         <p className="text-2xl text-gray-700">This stack uses:</p>
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
-          <TechnologyCard
-            name="NextJS"
-            description="The React framework for production"
-            documentation="https://nextjs.org/"
-          />
-          <TechnologyCard
-            name="TypeScript"
-            description="Strongly typed programming language that builds on JavaScript, giving you better tooling at any scale"
-            documentation="https://www.typescriptlang.org/"
-          />
-          <TechnologyCard
-            name="TailwindCSS"
-            description="Rapidly build modern websites without ever leaving your HTML"
-            documentation="https://tailwindcss.com/"
-          />
-          <TechnologyCard
-            name="tRPC"
-            description="End-to-end typesafe APIs made easy"
-            documentation="https://trpc.io/"
-          />
-        </div>
-        <div className="pt-6 text-2xl text-violet-500 flex-col flex justify-center items-center w-full">
-          {words
-            ? words.map((w) => (
-                <div key={w.id}>
-                  {w.value} ({w.tenant})
-                </div>
-              ))
-            : null}
-        </div>
-        <div>
-          <input
-            className="
-                form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
-                border border-solid border-gray-300 rounded
-                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-              "
-            placeholder="Tenant"
-            value={tenant}
-            onChange={(e) => setTenant(() => e.target.value)}
-          />
-          <input
-            className="
-                form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
-                border border-solid border-gray-300 rounded
-                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-              "
-            placeholder="Word or phrase"
-            value={word}
-            onChange={(e) => setWord(() => e.target.value)}
-          />
-          <button
-            className="bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={() => addWord({ value: word, tenant })}
-          >
-            Add word
-          </button>
+          <TechnologyCard name="test" description="Test" link="test/words" />
+          <TechnologyCard name="test2" description="Test2" link="test2/words" />
         </div>
       </main>
     </>
   );
 };
 
-const TechnologyCard = ({
-  name,
-  description,
-  documentation,
-}: TechnologyCardProps) => {
+const TechnologyCard = ({ name, description, link }: TechnologyCardProps) => {
   return (
     <section className="flex flex-col justify-center p-6 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
       <h2 className="text-lg text-gray-700">{name}</h2>
       <p className="text-sm text-gray-600">{description}</p>
       <a
         className="mt-3 text-sm underline text-violet-500 decoration-dotted underline-offset-2"
-        href={documentation}
-        target="_blank"
-        rel="noreferrer"
+        href={link}
       >
-        Documentation
+        Go to {name}
       </a>
     </section>
   );
