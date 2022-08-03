@@ -20,4 +20,6 @@ model VocValue {
     translations VocItem[]
     explanations VocItem[]
     usages       VocItem[]
+    dateAdded    DateTime
+    dateUpdated  DateTime?
 }

@@ -15,6 +15,7 @@ export const vocRouter = createRouter()
           value: input.value,
           tenant: input.tenant,
           language: "sv",
+          dateAdded: new Date(),
         },
       });
       return { id: result.id };
