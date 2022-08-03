@@ -4,6 +4,7 @@ import { z } from "zod";
 export const vocRouter = createRouter()
   .mutation("add", {
     input: z.object({
+      tenant: z.string(),
       value: z.string(),
     }),
     resolve: async ({ input, ctx }) => {
@@ -12,6 +13,7 @@ export const vocRouter = createRouter()
       const result = await ctx.prisma.vocValue.create({
         data: {
           value: input.value,
+          tenant: input.tenant,
           language: "sv",
         },
       });

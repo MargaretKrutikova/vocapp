@@ -87,7 +87,7 @@ const Home: NextPage = () => {
           />
           <button
             className="bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={() => addWord({ value: word })}
+            onClick={() => addWord({ value: word, tenant })}
           >
             Add word
           </button>
