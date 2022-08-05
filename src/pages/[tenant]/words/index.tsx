@@ -1,13 +1,14 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
-import {
-  LanguageInput,
-  LanguageInputList,
-} from "../../../components/LanguageInputList";
+import { LanguageInputList } from "../../../components/LanguageInputList";
 import { LanguageSelector } from "../../../components/LanguageSelector";
 import { TextField } from "../../../components/TextField";
-import { Language } from "../../../languages";
+import {
+  EMPTY_TRANSLATIONS,
+  Language,
+  LanguageValues,
+} from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 
 function Words() {
@@ -30,22 +31,30 @@ function Words() {
       },
     });
 
-  console.log({ isLoadingWords, isRefetchingWords, isAddingWord });
-
   const [word, setWord] = React.useState("");
   const [language, setLanguage] = React.useState<Language>("es");
 
-  const [translations, setTranslations] = React.useState<LanguageInput[]>([
-    { language: "sv", value: "" },
-  ]);
+  const [translations, setTranslations] =
+    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
 
   const canAddWord =
-    (isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
+    !(isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
 
   const addWord = (word: string) => {
-    if (!canAddWord) {
-      performAddWordMutation({ value: word, tenant, language });
+    if (canAddWord) {
+      performAddWordMutation({
+        value: word,
+        tenant,
+        language,
+        translations: Object.keys(translations)
+          .map((lang) => ({
+            value: translations[lang as Language],
+            language: lang,
+          }))
+          .filter((t) => t.value.length > 0),
+      });
       setWord("");
+      setTranslations(EMPTY_TRANSLATIONS);
     }
   };
 
@@ -56,12 +65,6 @@ function Words() {
         Failed to load words in {tenant}...
       </div>
     );
-
-  const inputClassName = `
-      form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
-      border border-solid border-gray-300 rounded
-      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-    `;
 
   return (
     <div>
@@ -89,13 +92,15 @@ function Words() {
           />
           <LanguageSelector language="es" onLanguageChange={setLanguage} />
 
-          <LanguageInputList inputs={translations} onChange={setTranslations} />
-          {/* <TranslationInput language="en" onLanguageChange={() => setTranslationLangua} /> */}
+          <LanguageInputList
+            languageValues={translations}
+            onChange={setTranslations}
+          />
           <button
             className={`${
-              canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"
+              !canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"
             } text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
-            disabled={canAddWord}
+            disabled={!canAddWord}
             onClick={() => addWord(word)}
           >
             Add word

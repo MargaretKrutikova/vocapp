@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { Language, languages } from "../languages";
+import { Language, LANGUAGES } from "../languages";
 
 type Props = {
   language: Language;
@@ -21,7 +21,7 @@ export const LanguageSelector = ({
     value={language}
     onChange={(e) => onLanguageChange(e.target.value as Language)}
   >
-    {languages.map((l) => (
+    {LANGUAGES.map((l) => (
       <option key={l} value={l}>
         {l}
       </option>
