@@ -1,7 +1,13 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
-import { languages, Language } from "../../../languages";
+import {
+  LanguageInput,
+  LanguageInputList,
+} from "../../../components/LanguageInputList";
+import { LanguageSelector } from "../../../components/LanguageSelector";
+import { TextField } from "../../../components/TextField";
+import { Language } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 
 function Words() {
@@ -28,6 +34,10 @@ function Words() {
 
   const [word, setWord] = React.useState("");
   const [language, setLanguage] = React.useState<Language>("es");
+
+  const [translations, setTranslations] = React.useState<LanguageInput[]>([
+    { language: "sv", value: "" },
+  ]);
 
   const canAddWord =
     (isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
@@ -72,24 +82,15 @@ function Words() {
             : null}
         </div>
         <div>
-          <input
-            className={inputClassName}
+          <TextField
             placeholder="Word or phrase"
             value={word}
-            onChange={(e) => setWord(() => e.target.value)}
+            onTextChange={setWord}
           />
-          {/* TODO: Create LanguageSelector component? */}
-          <select
-            className={inputClassName}
-            value={language}
-            onChange={(e) => setLanguage(e.target.value as Language)}
-          >
-            {languages.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
+          <LanguageSelector language="es" onLanguageChange={setLanguage} />
+
+          <LanguageInputList inputs={translations} onChange={setTranslations} />
+          {/* <TranslationInput language="en" onLanguageChange={() => setTranslationLangua} /> */}
           <button
             className={`${
               canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"

@@ -20,7 +20,8 @@
       "extensions": [
         "dbaeumer.vscode-eslint",
         "Prisma.prisma",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
       ],
       "settings": {
         "editor.formatOnSave": true,
