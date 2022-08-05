@@ -14,7 +14,7 @@ type VocItem {
 
 model VocValue {
     id           String    @id @default(auto()) @map("_id") @db.ObjectId
-    tenant       String?
+    tenant       String
     value        String
     language     String
     translations VocItem[]
