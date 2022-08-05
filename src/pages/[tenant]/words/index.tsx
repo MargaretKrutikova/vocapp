@@ -8,14 +8,14 @@ function Words() {
   const tenant = router.query.tenant as string;
 
   const queryClient = useQueryClient();
-  const queryName = "vocabulary.getAll";
+  const queryName = "vocabulary.getForTenant";
 
   const {
     data: words,
     error: errorLoadingWords,
     isLoading: isLoadingWords,
     isRefetching: isRefetchingWords,
-  } = trpc.useQuery([queryName]);
+  } = trpc.useQuery([queryName, { tenant }]);
   const { mutate: performAddWordMutation, isLoading: isAddingWord } =
     trpc.useMutation(["vocabulary.add"], {
       onSuccess: () => {

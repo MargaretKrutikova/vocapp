@@ -26,4 +26,15 @@ export const vocRouter = createRouter()
       await ctx.prisma.$connect();
       return await ctx.prisma.vocValue.findMany();
     },
+  })
+  .query("getForTenant", {
+    input: z.object({
+      tenant: z.string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      await ctx.prisma.$connect();
+      return await ctx.prisma.vocValue.findMany({
+        where: { tenant: input.tenant },
+      });
+    },
   });
