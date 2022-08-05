@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
+import { languages, Language } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 
 function Words() {
@@ -26,13 +27,14 @@ function Words() {
   console.log({ isLoadingWords, isRefetchingWords, isAddingWord });
 
   const [word, setWord] = React.useState("");
+  const [language, setLanguage] = React.useState<Language>("es");
 
   const canAddWord =
     (isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
 
   const addWord = (word: string) => {
     if (!canAddWord) {
-      performAddWordMutation({ value: word, tenant });
+      performAddWordMutation({ value: word, tenant, language });
       setWord("");
     }
   };
@@ -44,6 +46,12 @@ function Words() {
         Failed to load words in {tenant}...
       </div>
     );
+
+  const inputClassName = `
+      form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
+      border border-solid border-gray-300 rounded
+      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+    `;
 
   return (
     <div>
@@ -65,15 +73,23 @@ function Words() {
         </div>
         <div>
           <input
-            className="
-                form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding 
-                border border-solid border-gray-300 rounded
-                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-              "
+            className={inputClassName}
             placeholder="Word or phrase"
             value={word}
             onChange={(e) => setWord(() => e.target.value)}
           />
+          {/* TODO: Create LanguageSelector component? */}
+          <select
+            className={inputClassName}
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as Language)}
+          >
+            {languages.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
+          </select>
           <button
             className={`${
               canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"

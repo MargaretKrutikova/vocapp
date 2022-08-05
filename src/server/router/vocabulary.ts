@@ -6,15 +6,16 @@ export const vocRouter = createRouter()
     input: z.object({
       tenant: z.string(),
       value: z.string(),
+      language: z.string(),
     }),
-    resolve: async ({ input, ctx }) => {
+    resolve: async ({ input: { value, tenant, language }, ctx }) => {
       await ctx.prisma.$connect();
 
       const result = await ctx.prisma.vocValue.create({
         data: {
-          value: input.value,
-          tenant: input.tenant,
-          language: "sv",
+          value,
+          tenant,
+          language,
           dateAdded: new Date(),
         },
       });
