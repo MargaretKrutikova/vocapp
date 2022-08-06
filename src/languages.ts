@@ -11,3 +11,6 @@ export const EMPTY_TRANSLATIONS: LanguageValues = LANGUAGES.reduce(
   (res, l) => ({ ...res, [l]: "" }),
   {} as LanguageValues
 );
+
+export const typedLanguageKeys = (languageValues: LanguageValues) =>
+  Object.keys(languageValues).map((l) => l as Language);

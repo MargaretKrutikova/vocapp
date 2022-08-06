@@ -3,6 +3,7 @@ import {
   DEFAULT_TRANSLATION_LANGUAGE,
   Language,
   LanguageValues,
+  typedLanguageKeys,
 } from "../languages";
 import { TextField } from "./TextField";
 
@@ -22,14 +23,14 @@ export const LanguageInputList = ({ languageValues, onChange }: Props) => {
 
   return (
     <div>
-      {Object.keys(languageValues).map((language) =>
+      {typedLanguageKeys(languageValues).map((language) =>
         isExpanded || language === DEFAULT_TRANSLATION_LANGUAGE ? (
           <div key={language} className="flex">
             {language}:
             <TextField
-              value={languageValues[language as Language]}
+              value={languageValues[language]}
               onTextChange={(value: string) =>
-                handleTextChange(value, language as Language)
+                handleTextChange(value, language)
               }
             />
           </div>

@@ -8,6 +8,7 @@ import {
   EMPTY_TRANSLATIONS,
   Language,
   LanguageValues,
+  typedLanguageKeys,
 } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 
@@ -46,10 +47,10 @@ function Words() {
         value: word,
         tenant,
         language,
-        translations: Object.keys(translations)
-          .map((lang) => ({
-            value: translations[lang as Language],
-            language: lang,
+        translations: typedLanguageKeys(translations)
+          .map((language) => ({
+            value: translations[language],
+            language,
           }))
           .filter((t) => t.value.length > 0),
       });
