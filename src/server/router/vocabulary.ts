@@ -1,5 +1,6 @@
 import { createRouter } from "./context";
 import { z } from "zod";
+import { Prisma, VocValue } from "@prisma/client";
 
 export const vocRouter = createRouter()
   .mutation("add", {
@@ -15,8 +16,6 @@ export const vocRouter = createRouter()
       input: { value, tenant, language, translations },
       ctx,
     }) => {
-      await ctx.prisma.$connect();
-
       const result = await ctx.prisma.vocValue.create({
         data: {
           value,
@@ -31,7 +30,6 @@ export const vocRouter = createRouter()
   })
   .query("getAll", {
     resolve: async ({ ctx }) => {
-      await ctx.prisma.$connect();
       return await ctx.prisma.vocValue.findMany();
     },
   })
@@ -40,9 +38,30 @@ export const vocRouter = createRouter()
       tenant: z.string(),
     }),
     resolve: async ({ ctx, input }) => {
-      await ctx.prisma.$connect();
       return await ctx.prisma.vocValue.findMany({
         where: { tenant: input.tenant },
       });
+    },
+  })
+  .query("getRandomForTenant", {
+    input: z.object({
+      tenant: z.string(),
+      previousWords: z.array(z.string()),
+    }),
+    resolve: async ({ ctx, input }) => {
+      const tenantWhereClause: Prisma.VocValueWhereInput = {
+        tenant: input.tenant,
+      };
+
+      const rawResult = await ctx.prisma.vocValue.aggregateRaw({
+        pipeline: [
+          { $match: tenantWhereClause as Prisma.InputJsonValue },
+          { $match: { value: { $nin: input.previousWords } } },
+          { $sample: { size: 1 } },
+        ],
+      });
+
+      const typedResponse = rawResult as unknown as VocValue[];
+      return typedResponse[0];
     },
   });
