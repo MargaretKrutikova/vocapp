@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  DEFAULT_TRANSLATION_LANGUAGE,
-  Language,
-  LanguageValues,
-  typedLanguageKeys,
-} from "../languages";
+import { DEFAULT_TRANSLATION_LANGUAGE, LanguageValues } from "../languages";
 import { TextField } from "./TextField";
 
 type Props = {
@@ -15,22 +10,16 @@ type Props = {
 export const LanguageInputList = ({ languageValues, onChange }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleTextChange = (value: string, lang: Language) => {
-    const updatedRecord = { ...languageValues };
-    updatedRecord[lang] = value;
-    onChange(updatedRecord);
-  };
-
   return (
     <div>
-      {typedLanguageKeys(languageValues).map((language) =>
+      {[...languageValues.entries()].map(([language, value]) =>
         isExpanded || language === DEFAULT_TRANSLATION_LANGUAGE ? (
           <div key={language} className="flex">
             {language}:
             <TextField
-              value={languageValues[language]}
+              value={value}
               onTextChange={(value: string) =>
-                handleTextChange(value, language)
+                onChange(new Map(languageValues).set(language, value))
               }
             />
           </div>
