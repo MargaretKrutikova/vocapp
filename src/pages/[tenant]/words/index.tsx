@@ -75,11 +75,18 @@ function Words() {
       {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
 
       <div>
-        <div className="pt-6 text-2xl text-violet-500 flex-col flex justify-center items-center w-full">
+        <div className="pt-6 text-2xl text-violet-500 flex-col flex w-full ml-4 mb-6">
           {words
             ? words.map((w) => (
                 <div key={w.id}>
-                  {w.value} ({w.tenant})
+                  {w.value}
+                  <div className="text-lg">
+                    {w.translations.map((t) => (
+                      <div key={t.language}>
+                        {t.language}: {t.value}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))
             : null}
