@@ -49,19 +49,21 @@ export const vocRouter = createRouter()
       previousWords: z.array(z.string()),
     }),
     resolve: async ({ ctx, input }) => {
-      const tenantWhereClause: Prisma.VocValueWhereInput = {
+      const tenantFilter: Prisma.VocValueWhereInput = {
         tenant: input.tenant,
+        value: { notIn: input.previousWords },
       };
 
-      const rawResult = await ctx.prisma.vocValue.aggregateRaw({
-        pipeline: [
-          { $match: tenantWhereClause as Prisma.InputJsonValue },
-          { $match: { value: { $nin: input.previousWords } } },
-          { $sample: { size: 1 } },
-        ],
+      const totalCount = await ctx.prisma.vocValue.count({
+        where: tenantFilter,
       });
 
-      const typedResponse = rawResult as unknown as VocValue[];
-      return typedResponse[0];
+      const result: VocValue[] = await ctx.prisma.vocValue.findMany({
+        where: tenantFilter,
+        skip: Math.floor(totalCount * Math.random()),
+        take: 1,
+      });
+
+      return result[0];
     },
   });
