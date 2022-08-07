@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
@@ -68,8 +69,11 @@ export default function Words() {
 
   return (
     <div>
-      <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700">
-        Words in {tenant}:
+      <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
+        Words in {tenant}.
+        <Link href={`/${tenant}/flash`}>
+          <a className="border-black border-2">Flash</a>
+        </Link>
       </h6>
 
       {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
@@ -92,12 +96,16 @@ export default function Words() {
             : null}
         </div>
         <div>
-          <TextField
-            placeholder="Word or phrase"
-            value={word}
-            onTextChange={setWord}
-          />
-          <LanguageSelector language="es" onLanguageChange={setLanguage} />
+          <div className="flex">
+            <TextField
+              autoFocus={true}
+              tabIndex={0}
+              placeholder="Word or phrase"
+              value={word}
+              onTextChange={setWord}
+            />
+            <LanguageSelector language="es" onLanguageChange={setLanguage} />
+          </div>
 
           <LanguageInputList
             languageValues={translations}

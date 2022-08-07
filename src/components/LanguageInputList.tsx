@@ -27,8 +27,9 @@ export const LanguageInputList = ({ languageValues, onChange }: Props) => {
       )}
       <input
         type="button"
-        value="Expand or Collapse"
-        onClick={() => setIsExpanded((prev) => !prev)}
+        className="border-black border-2"
+        value={isExpanded ? "Collapse" : "Expand"}
+        onClick={() => setIsExpanded((prevValue) => !prevValue)}
       />
     </div>
   );
