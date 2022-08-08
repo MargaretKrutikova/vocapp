@@ -25,8 +25,12 @@ const Home: NextPage = () => {
         </h1>
         <p className="text-2xl text-gray-700">Test URLs:</p>
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
+          <TechnologyCard
+            name="spanish"
+            description="Spanish"
+            link="spanish/words"
+          />
           <TechnologyCard name="test" description="Test" link="test/words" />
-          <TechnologyCard name="test2" description="Test2" link="test2/words" />
         </div>
       </main>
     </>
