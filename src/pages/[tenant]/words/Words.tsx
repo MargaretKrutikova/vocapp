@@ -1,3 +1,4 @@
+import { VocItem } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -11,6 +12,14 @@ import {
   LanguageValues,
 } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
+
+const mapLanguageValues = (values: LanguageValues): VocItem[] =>
+  [...values.entries()]
+    .map(([language, value]) => ({
+      value,
+      language,
+    }))
+    .filter((t) => t.value.length > 0);
 
 export default function Words() {
   const router = useRouter();
@@ -38,6 +47,12 @@ export default function Words() {
   const [translations, setTranslations] =
     React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
 
+  const [explanations, setExplanations] =
+    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
+
+  const [usages, setUsages] =
+    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
+
   const canAddWord =
     !(isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
 
@@ -47,15 +62,14 @@ export default function Words() {
         value: word,
         tenant,
         language,
-        translations: [...translations.entries()]
-          .map(([language, value]) => ({
-            value,
-            language,
-          }))
-          .filter((t) => t.value.length > 0),
+        translations: mapLanguageValues(translations),
+        explanations: mapLanguageValues(explanations),
+        usages: mapLanguageValues(usages),
       });
       setWord("");
       setTranslations(EMPTY_TRANSLATIONS);
+      setExplanations(EMPTY_TRANSLATIONS);
+      setUsages(EMPTY_TRANSLATIONS);
     }
   };
 
@@ -91,6 +105,20 @@ export default function Words() {
                       </div>
                     ))}
                   </div>
+                  <div className="text-sm">
+                    {w.explanations.map((t) => (
+                      <div key={t.language}>
+                        {t.language}: {t.value}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-sm">
+                    {w.usages.map((t) => (
+                      <div key={t.language}>
+                        {t.language}: {t.value}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))
             : null}
@@ -110,7 +138,19 @@ export default function Words() {
           <LanguageInputList
             languageValues={translations}
             onChange={setTranslations}
+            type="input"
           />
+          <LanguageInputList
+            languageValues={explanations}
+            onChange={setExplanations}
+            title="Explanations"
+          />
+          <LanguageInputList
+            languageValues={usages}
+            onChange={setUsages}
+            title="Usages"
+          />
+
           <button
             className={`${
               !canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"

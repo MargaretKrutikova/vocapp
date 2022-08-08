@@ -10,10 +10,14 @@ export const vocRouter = createRouter()
       translations: z.array(
         z.object({ value: z.string(), language: z.string() })
       ),
+      explanations: z.array(
+        z.object({ value: z.string(), language: z.string() })
+      ),
+      usages: z.array(z.object({ value: z.string(), language: z.string() })),
       language: z.string(),
     }),
     resolve: async ({
-      input: { value, tenant, language, translations },
+      input: { value, tenant, language, translations, explanations, usages },
       ctx,
     }) => {
       const result = await ctx.prisma.vocValue.create({
@@ -22,6 +26,8 @@ export const vocRouter = createRouter()
           tenant,
           language,
           translations,
+          explanations,
+          usages,
           dateAdded: new Date(),
         },
       });
