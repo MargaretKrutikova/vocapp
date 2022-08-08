@@ -14,13 +14,15 @@ export const createEmptyLanguageValues = (): LanguageValues =>
 
 export const createLanguageValuesFromVocItems = (
   vocItems: VocItem[]
-): LanguageValues =>
-  new Map(
+): LanguageValues => {
+  const currentValues = new Map(
     vocItems.reduce(
       (acc, item) => [...acc, [item.language as Language, item.value]],
       [] as [Language, string][]
     )
   );
+  return new Map(LANGUAGES.map((l) => [l, currentValues.get(l) || ""]));
+};
 
 export const mapLanguageValues = (values: LanguageValues): VocItem[] =>
   [...values.entries()]
