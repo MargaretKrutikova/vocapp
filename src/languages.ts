@@ -7,6 +7,5 @@ export const DEFAULT_TRANSLATION_LANGUAGE: Language = "en";
 
 export type LanguageValues = Map<Language, string>;
 
-export const EMPTY_TRANSLATIONS: LanguageValues = new Map(
-  LANGUAGES.map((l) => [l, ""])
-);
+export const createEmptyLanguageValues = (): LanguageValues =>
+  new Map(LANGUAGES.map((l) => [l, ""]));

@@ -3,15 +3,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
-import { LanguageInputList } from "../../../components/LanguageInputList";
-import { LanguageSelector } from "../../../components/LanguageSelector";
-import { TextField } from "../../../components/TextField";
-import {
-  EMPTY_TRANSLATIONS,
-  Language,
-  LanguageValues,
-} from "../../../languages";
+import { LanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
+import { useWordForm } from "./useWordForm";
+import { WordForm } from "./WordForm";
 
 const mapLanguageValues = (values: LanguageValues): VocItem[] =>
   [...values.entries()]
@@ -41,35 +36,24 @@ export default function Words() {
       },
     });
 
-  const [word, setWord] = React.useState("");
-  const [language, setLanguage] = React.useState<Language>("es");
-
-  const [translations, setTranslations] =
-    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
-
-  const [explanations, setExplanations] =
-    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
-
-  const [usages, setUsages] =
-    React.useState<LanguageValues>(EMPTY_TRANSLATIONS);
+  const [wordState, dispatch] = useWordForm();
 
   const canAddWord =
-    !(isLoadingWords || isAddingWord || isRefetchingWords) && word.length > 0;
+    !(isLoadingWords || isAddingWord || isRefetchingWords) &&
+    wordState.word.length > 0;
 
-  const addWord = (word: string) => {
+  const addWord = () => {
     if (canAddWord) {
       performAddWordMutation({
-        value: word,
         tenant,
-        language,
-        translations: mapLanguageValues(translations),
-        explanations: mapLanguageValues(explanations),
-        usages: mapLanguageValues(usages),
+        value: wordState.word,
+        language: wordState.language,
+        translations: mapLanguageValues(wordState.translations),
+        explanations: mapLanguageValues(wordState.explanations),
+        usages: mapLanguageValues(wordState.usages),
       });
-      setWord("");
-      setTranslations(EMPTY_TRANSLATIONS);
-      setExplanations(EMPTY_TRANSLATIONS);
-      setUsages(EMPTY_TRANSLATIONS);
+
+      dispatch({ type: "ClearForm" });
     }
   };
 
@@ -123,44 +107,12 @@ export default function Words() {
               ))
             : null}
         </div>
-        <div>
-          <div className="flex">
-            <TextField
-              autoFocus={true}
-              tabIndex={0}
-              placeholder="Word or phrase"
-              value={word}
-              onTextChange={setWord}
-            />
-            <LanguageSelector language="es" onLanguageChange={setLanguage} />
-          </div>
-
-          <LanguageInputList
-            languageValues={translations}
-            onChange={setTranslations}
-            type="input"
-          />
-          <LanguageInputList
-            languageValues={explanations}
-            onChange={setExplanations}
-            title="Explanations"
-          />
-          <LanguageInputList
-            languageValues={usages}
-            onChange={setUsages}
-            title="Usages"
-          />
-
-          <button
-            className={`${
-              !canAddWord ? "bg-gray-300" : "bg-violet-500 hover:bg-violet-700"
-            } text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
-            disabled={!canAddWord}
-            onClick={() => addWord(word)}
-          >
-            Add word
-          </button>
-        </div>
+        <WordForm
+          dispatch={dispatch}
+          state={wordState}
+          canSaveWord={canAddWord}
+          onSave={addWord}
+        />
       </div>
     </div>
   );
