@@ -4,8 +4,8 @@ import React from "react";
 import { useQueryClient } from "react-query";
 import { mapLanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
-import { useWordForm } from "./useWordForm";
-import { WordForm } from "./WordForm";
+import { useWordForm } from "../../../hooks/useWordForm";
+import { WordForm } from "../../../components/WordForm";
 
 export default function Words() {
   const router = useRouter();

@@ -5,7 +5,7 @@ import {
   createLanguageValuesFromVocItems,
   Language,
   LanguageValues,
-} from "../../../languages";
+} from "../languages";
 
 export type WordFormState = {
   word: string;
@@ -43,9 +43,6 @@ const reducer: Reducer<WordFormState, WordFormAction> = (
       return createInitWordFormState();
     case "InitState":
       return action.state;
-
-    default:
-      return state;
   }
 };
 

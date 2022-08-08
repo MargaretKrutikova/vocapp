@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import { mapLanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
-import { useWordForm } from "../words/useWordForm";
-import { WordForm } from "../words/WordForm";
+import { useWordForm } from "../../../hooks/useWordForm";
+import { WordForm } from "../../../components/WordForm";
 
 export default function EditWord() {
   const router = useRouter();

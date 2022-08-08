@@ -1,8 +1,8 @@
 import { Dispatch } from "react";
-import { LanguageInputList } from "../../../components/LanguageInputList";
-import { LanguageSelector } from "../../../components/LanguageSelector";
-import { TextField } from "../../../components/TextField";
-import { WordFormAction, WordFormState } from "./useWordForm";
+import { LanguageInputList } from "./LanguageInputList";
+import { LanguageSelector } from "./LanguageSelector";
+import { TextField } from "./TextField";
+import { WordFormAction, WordFormState } from "../hooks/useWordForm";
 
 type Props = {
   state: WordFormState;
