@@ -34,6 +34,36 @@ export const vocRouter = createRouter()
       return { id: result.id };
     },
   })
+  .mutation("edit", {
+    input: z.object({
+      id: z.string(),
+      value: z.string(),
+      translations: z.array(
+        z.object({ value: z.string(), language: z.string() })
+      ),
+      explanations: z.array(
+        z.object({ value: z.string(), language: z.string() })
+      ),
+      usages: z.array(z.object({ value: z.string(), language: z.string() })),
+      language: z.string(),
+    }),
+    resolve: async ({
+      input: { id, value, language, translations, explanations, usages },
+      ctx,
+    }) => {
+      const result = await ctx.prisma.vocValue.update({
+        data: {
+          value,
+          language,
+          translations,
+          explanations,
+          usages,
+        },
+        where: { id },
+      });
+      return { id: result.id };
+    },
+  })
   .query("getAll", {
     resolve: async ({ ctx }) => {
       return await ctx.prisma.vocValue.findMany();
@@ -46,6 +76,16 @@ export const vocRouter = createRouter()
     resolve: async ({ ctx, input }) => {
       return await ctx.prisma.vocValue.findMany({
         where: { tenant: input.tenant },
+      });
+    },
+  })
+  .query("getById", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      return await ctx.prisma.vocValue.findUnique({
+        where: { id: input.id },
       });
     },
   })
