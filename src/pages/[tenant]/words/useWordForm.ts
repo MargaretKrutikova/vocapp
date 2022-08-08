@@ -1,6 +1,8 @@
-import { Dispatch, Reducer, useReducer } from "react";
+import { VocValue } from "@prisma/client";
+import { Dispatch, Reducer, useEffect, useReducer } from "react";
 import {
   createEmptyLanguageValues,
+  createLanguageValuesFromVocItems,
   Language,
   LanguageValues,
 } from "../../../languages";
@@ -19,7 +21,8 @@ export type WordFormAction =
   | { type: "SetTranslations"; translations: LanguageValues }
   | { type: "SetExplanations"; explanations: LanguageValues }
   | { type: "SetUsages"; usages: LanguageValues }
-  | { type: "ClearForm" };
+  | { type: "ClearForm" }
+  | { type: "InitState"; state: WordFormState };
 
 const reducer: Reducer<WordFormState, WordFormAction> = (
   state: WordFormState,
@@ -38,6 +41,8 @@ const reducer: Reducer<WordFormState, WordFormAction> = (
       return { ...state, usages: action.usages };
     case "ClearForm":
       return createInitWordFormState();
+    case "InitState":
+      return action.state;
 
     default:
       return state;
@@ -52,10 +57,27 @@ const createInitWordFormState = (): WordFormState => ({
   usages: createEmptyLanguageValues(),
 });
 
+const createStateFromVocValue = (vocValue: VocValue): WordFormState => ({
+  word: vocValue.value,
+  language: vocValue.language as Language,
+  translations: createLanguageValuesFromVocItems(vocValue.translations),
+  explanations: createLanguageValuesFromVocItems(vocValue.explanations),
+  usages: createLanguageValuesFromVocItems(vocValue.usages),
+});
+
 export const useWordForm = (
-  wordState?: WordFormState
+  vocValue?: VocValue | null
 ): [WordFormState, Dispatch<WordFormAction>] => {
-  const initialState = wordState || createInitWordFormState();
+  const initialState = vocValue
+    ? createStateFromVocValue(vocValue)
+    : createInitWordFormState();
+
   const [state, dispatch] = useReducer(reducer, initialState);
+  useEffect(() => {
+    if (vocValue) {
+      dispatch({ type: "InitState", state: createStateFromVocValue(vocValue) });
+    }
+  }, [vocValue]);
+
   return [state, dispatch];
 };

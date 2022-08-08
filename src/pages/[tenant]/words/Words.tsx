@@ -1,20 +1,11 @@
-import { VocItem } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { useQueryClient } from "react-query";
-import { LanguageValues } from "../../../languages";
+import { mapLanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 import { useWordForm } from "./useWordForm";
 import { WordForm } from "./WordForm";
-
-const mapLanguageValues = (values: LanguageValues): VocItem[] =>
-  [...values.entries()]
-    .map(([language, value]) => ({
-      value,
-      language,
-    }))
-    .filter((t) => t.value.length > 0);
 
 export default function Words() {
   const router = useRouter();
@@ -88,6 +79,13 @@ export default function Words() {
                         {t.language}: {t.value}
                       </div>
                     ))}
+                    <button
+                      onClick={() => {
+                        router.push(`/${tenant}/${w.id}`);
+                      }}
+                    >
+                      ✎
+                    </button>
                   </div>
                   <div className="text-sm">
                     {w.explanations.map((t) => (
