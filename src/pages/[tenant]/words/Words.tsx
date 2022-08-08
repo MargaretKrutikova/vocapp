@@ -72,20 +72,23 @@ export default function Words() {
           {words
             ? words.map((w) => (
                 <div key={w.id}>
-                  {w.value}
-                  <div className="text-lg">
-                    {w.translations.map((t) => (
-                      <div key={t.language}>
-                        {t.language}: {t.value}
-                      </div>
-                    ))}
+                  <div className="flex">
+                    {w.value}
                     <button
+                      className="px-4"
                       onClick={() => {
                         router.push(`/${tenant}/${w.id}`);
                       }}
                     >
                       ✎
                     </button>
+                  </div>
+                  <div className="text-lg">
+                    {w.translations.map((t) => (
+                      <div key={t.language}>
+                        {t.language}: {t.value}
+                      </div>
+                    ))}
                   </div>
                   <div className="text-sm">
                     {w.explanations.map((t) => (
