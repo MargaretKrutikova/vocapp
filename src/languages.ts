@@ -1,3 +1,5 @@
+import { VocItem } from "@prisma/client";
+
 export const LANGUAGES = ["en", "sv", "es", "ru"] as const;
 
 export type Language = typeof LANGUAGES[number];
@@ -9,3 +11,21 @@ export type LanguageValues = Map<Language, string>;
 
 export const createEmptyLanguageValues = (): LanguageValues =>
   new Map(LANGUAGES.map((l) => [l, ""]));
+
+export const createLanguageValuesFromVocItems = (
+  vocItems: VocItem[]
+): LanguageValues =>
+  new Map(
+    vocItems.reduce(
+      (acc, item) => [...acc, [item.language as Language, item.value]],
+      [] as [Language, string][]
+    )
+  );
+
+export const mapLanguageValues = (values: LanguageValues): VocItem[] =>
+  [...values.entries()]
+    .map(([language, value]) => ({
+      value,
+      language,
+    }))
+    .filter((t) => t.value.length > 0);
