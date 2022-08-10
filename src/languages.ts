@@ -27,7 +27,7 @@ export const createLanguageValuesFromVocItems = (
 export const mapLanguageValues = (values: LanguageValues): VocItem[] =>
   [...values.entries()]
     .map(([language, value]) => ({
-      value,
+      value: value.trim(),
       language,
     }))
     .filter((t) => t.value.length > 0);

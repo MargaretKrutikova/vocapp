@@ -1,11 +1,38 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { useQueryClient } from "react-query";
 import { mapLanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 import { useWordForm } from "../../../hooks/useWordForm";
 import { WordForm } from "../../../components/WordForm";
+import { TextField } from "../../../components/TextField";
+import { VocItem, VocValue } from "@prisma/client";
+
+const transformText = (text: string) =>
+  text
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+
+const searchIsInVocItems = (vocItems: VocItem[], searchQuery: string) =>
+  vocItems.some((item) => transformText(item.value).includes(searchQuery));
+
+const filterWords = (wordsToFilter: VocValue[], searchQuery: string) => {
+  const query = searchQuery ? searchQuery.trim().toLocaleLowerCase() : "";
+
+  if (wordsToFilter && query) {
+    return wordsToFilter.filter(
+      (w) =>
+        transformText(w.value).includes(query) ||
+        searchIsInVocItems(w.translations, query) ||
+        searchIsInVocItems(w.explanations, query) ||
+        searchIsInVocItems(w.usages, query)
+    );
+  }
+  return wordsToFilter;
+};
 
 export default function Words() {
   const router = useRouter();
@@ -28,6 +55,7 @@ export default function Words() {
     });
 
   const [wordState, dispatch] = useWordForm();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const canAddWord =
     !(isLoadingWords || isAddingWord || isRefetchingWords) &&
@@ -68,9 +96,10 @@ export default function Words() {
       {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
 
       <div>
+        <TextField value={searchQuery} onTextChange={setSearchQuery} />
         <div className="pt-6 text-2xl text-violet-500 flex-col flex w-full ml-4 mb-6">
           {words
-            ? words.map((w) => (
+            ? filterWords(words, searchQuery).map((w) => (
                 <div key={w.id}>
                   <div className="flex">
                     {w.value}

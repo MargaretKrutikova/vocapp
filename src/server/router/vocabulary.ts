@@ -64,11 +64,6 @@ export const vocRouter = createRouter()
       return { id: result.id };
     },
   })
-  .query("getAll", {
-    resolve: async ({ ctx }) => {
-      return await ctx.prisma.vocValue.findMany();
-    },
-  })
   .query("getForTenant", {
     input: z.object({
       tenant: z.string(),

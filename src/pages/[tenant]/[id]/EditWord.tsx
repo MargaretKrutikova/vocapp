@@ -33,7 +33,7 @@ export default function EditWord() {
     if (canSave) {
       performEditWordMutation({
         id,
-        value: wordState.word,
+        value: wordState.word.trim(),
         language: wordState.language,
         translations: mapLanguageValues(wordState.translations),
         explanations: mapLanguageValues(wordState.explanations),
