@@ -28,16 +28,18 @@ echo $TF_VAR_TEST_TF_VAR1
 echo "ATLAS_ORG_ID:"
 echo $ATLAS_ORG_ID
 
-# terraform plan \
-#   -var "atlas_org_id=$ATLAS_ORG_ID" \
-#   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
-#   -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
-#   --out=main.tfplan
+terraform plan \
+  -var "test_var1=$TEST_VAR1" \
+  -var "test_tf_var1=$TF_VAR_TEST_TF_VAR1" \
+  -var "atlas_org_id=$ATLAS_ORG_ID" \
+  -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
+  -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
+  --out=main.tfplan
 
-# terraform apply main.tfplan
+terraform apply main.tfplan
 
-# az webapp deploy \
-#     --resource-group "VocAppGroup" \
-#     --name "vocwebapp" \
-#     --type=zip \
-#     --src-path $PUBLISH_FILE
+az webapp deploy \
+    --resource-group "VocAppGroup" \
+    --name "vocwebapp" \
+    --type=zip \
+    --src-path $PUBLISH_FILE

@@ -14,6 +14,14 @@ variable "atlas_org_id" {
   type = string
 }
 
+variable "test_var1" {
+  type = string
+}
+
+variable "test_tf_var1" {
+  type = string
+}
+
 variable "mongodbatlas_public_key" {
   type = string
 }
@@ -217,6 +225,8 @@ resource "azurerm_app_service" "vocappservice" {
   app_settings = {
     "DeployDate"                      = timestamp()
     "DATABASE_URL"                    = local.atlas_connection
+    "test_var1"                       = local.test_var1
+    "test_tf_var1"                    = local.test_tf_var1
   }
 
   site_config {
