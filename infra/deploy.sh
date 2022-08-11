@@ -7,6 +7,9 @@ export ARM_SUBSCRIPTION_ID=$(az account show --query id | xargs)
 export ARM_TENANT_ID=$(az account show --query tenantId | xargs)
 
 PUBLISH_FILE=$1
+ATLAS_ORG_ID=$2
+MONGODBATLAS_PRIVATE_KEY=$3
+MONGODBATLAS_PUBLIC_KEY=$4
 
 RESOURCE_GROUP_NAME=tfstatevocapp
 STORAGE_ACCOUNT_NAME=vocappstorage
@@ -29,8 +32,6 @@ echo "ATLAS_ORG_ID:"
 echo $ATLAS_ORG_ID
 
 terraform plan \
-  -var "test_var1=$TEST_VAR1" \
-  -var "test_tf_var1=$TF_VAR_TEST_TF_VAR1" \
   -var "atlas_org_id=$ATLAS_ORG_ID" \
   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
   -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
