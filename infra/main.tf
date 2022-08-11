@@ -225,8 +225,8 @@ resource "azurerm_app_service" "vocappservice" {
   app_settings = {
     "DeployDate"                      = timestamp()
     # "DATABASE_URL"                    = local.atlas_connection
-    "TEST_VAR1"                       = local.test_var1
-    "TEST_TF_VAR1"                    = local.test_tf_var1
+    "TEST_VAR1"                       = var.test_var1
+    "TEST_TF_VAR1"                    = var.test_tf_var1
   }
 
   site_config {
