@@ -31,6 +31,12 @@ echo $TF_VAR_TEST_TF_VAR1
 echo "ATLAS_ORG_ID:"
 echo $ATLAS_ORG_ID
 
+echo "MONGODBATLAS_PRIVATE_KEY:"
+echo MONGODBATLAS_PRIVATE_KEY
+
+echo "MONGODBATLAS_PUBLIC_KEY:"
+echo MONGODBATLAS_PUBLIC_KEY
+
 terraform plan \
   -var "atlas_org_id=$ATLAS_ORG_ID" \
   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
