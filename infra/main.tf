@@ -236,11 +236,11 @@ resource "azurerm_app_service" "vocappservice" {
   }
 }
 
-resource "mongodbatlas_project_ip_access_list" "appservice_atlas_ip" {
-  for_each = {
-    for key, value in azurerm_app_service.vocappservice.outbound_ip_address_list : key => value
-  }
-  project_id = mongodbatlas_project.atlas_project.id
-  ip_address = each.value
-  comment    = "App service IP address"
-}
+# resource "mongodbatlas_project_ip_access_list" "appservice_atlas_ip" {
+#   for_each = {
+#     for key, value in azurerm_app_service.vocappservice.outbound_ip_address_list : key => value
+#   }
+#   project_id = mongodbatlas_project.atlas_project.id
+#   ip_address = each.value
+#   comment    = "App service IP address"
+# }
