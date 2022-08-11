@@ -10,12 +10,31 @@ variable "collection_name" {
   default = "VocValue"
 }
 
+variable "atlas_org_id" {
+  type = string
+}
+
+variable "mongodbatlas_public_key" {
+  type = string
+}
+
+variable "mongodbatlas_private_key" {
+  type = string
+}
+
+variable "atlas_dbuser" {
+  default = "voc-app-user"
+}
+
 # providers
 terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~>2.0"
+    }
+    mongodbatlas = {
+      source = "mongodb/mongodbatlas"
     }
   }
 
@@ -29,6 +48,51 @@ terraform {
 
 provider "azurerm" {
   features {}
+}
+
+provider "mongodbatlas" {
+  public_key  = var.mongodbatlas_public_key
+  private_key = var.mongodbatlas_private_key
+}
+
+# mongodb atlas
+
+resource "mongodbatlas_project" "atlas_project" {
+  name   = "voc-app"
+  org_id = var.atlas_org_id
+}
+
+resource "mongodbatlas_cluster" "cluster-atlas" {
+  project_id   = mongodbatlas_project.atlas_project.id
+  name         = "shared-cluster"
+  cluster_type = "REPLICASET"
+
+  mongo_db_major_version = "5.0"
+
+  # Provider Settings "block"
+  provider_name               = "TENANT"
+  backing_provider_name       = "AZURE"
+  provider_instance_size_name = "M0"
+  provider_region_name        = "EUROPE_NORTH"
+}
+
+resource "random_password" "atlas_dbpassword" {
+  length  = 16
+  special = false
+}
+
+resource "mongodbatlas_database_user" "voc-app-user" {
+  username = var.atlas_dbuser
+  password = random_password.atlas_dbpassword.result
+
+  auth_database_name = "admin"
+  project_id         = mongodbatlas_project.atlas_project.id
+
+  roles {
+    role_name     = "readWrite"
+    database_name = var.db_name
+  }
+  depends_on = [mongodbatlas_project.atlas_project]
 }
 
 resource "azurerm_resource_group" "vocappgroup" {
@@ -132,6 +196,17 @@ locals {
   con = split("?", azurerm_cosmosdb_account.cosmosaccount.connection_strings[0])
 }
 
+locals {
+  con_parts = split("://", mongodbatlas_cluster.cluster-atlas.srv_address)
+  atlas_connection = format("%s://%s:%s@%s/%s?%s",
+    local.con_parts[0],
+    mongodbatlas_database_user.voc-app-user.username,
+    mongodbatlas_database_user.voc-app-user.password,
+    local.con_parts[1],
+    var.db_name,
+  "retryWrites=true&w=majority")
+}
+
 resource "azurerm_app_service" "vocappservice" {
   name                = var.webapp_name
   location            = azurerm_resource_group.vocappgroup.location
@@ -145,6 +220,7 @@ resource "azurerm_app_service" "vocappservice" {
     "MongoSettings__ConnectionString" = azurerm_cosmosdb_account.cosmosaccount.connection_strings[0]
     "MongoSettings__DatabaseName"     = var.db_name
     "MongoSettings__CollectionName"   = var.collection_name
+    "ATLAS_DATABASE_URL"              = local.atlas_connection
   }
 
   site_config {
@@ -152,4 +228,13 @@ resource "azurerm_app_service" "vocappservice" {
     use_32_bit_worker_process = true
     app_command_line          = "node ./packaged/server.js"
   }
+}
+
+resource "mongodbatlas_project_ip_access_list" "appservice_atlas_ip" {
+  for_each = {
+    for key, value in azurerm_app_service.vocappservice.outbound_ip_address_list : key => value
+  }
+  project_id = mongodbatlas_project.atlas_project.id
+  ip_address = each.value
+  comment    = "App service IP address"
 }
