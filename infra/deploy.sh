@@ -16,6 +16,15 @@ ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 
 # terraform plan --out=main.tfplan
+
+echo "Testing vars:"
+
+echo "test_var1:"
+echo $(test_var1)
+
+echo "TF_VAR_test_tf_var1:"
+echo $(TF_VAR_test_tf_var1)
+
 terraform plan \
   -var "atlas_org_id=$ATLAS_ORG_ID" \
   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
