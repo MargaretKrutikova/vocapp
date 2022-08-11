@@ -20,10 +20,12 @@ export ARM_ACCESS_KEY=$ACCOUNT_KEY
 echo "Testing vars:"
 
 echo "test_var1:"
+echo $TEST_VAR1
 echo $test_var1
 echo $(test_var1)
 
 echo "TF_VAR_test_tf_var1:"
+echo $TF_VAR_TEST_TF_VAR1
 echo $TF_VAR_test_tf_var1
 echo $(TF_VAR_test_tf_var1)
 
