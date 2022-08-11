@@ -41,9 +41,9 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~>2.0"
     }
-    mongodbatlas = {
-      source = "mongodb/mongodbatlas"
-    }
+    # mongodbatlas = {
+    #   source = "mongodb/mongodbatlas"
+    # }
   }
 
   backend "azurerm" {
@@ -58,50 +58,50 @@ provider "azurerm" {
   features {}
 }
 
-provider "mongodbatlas" {
-  public_key  = var.mongodbatlas_public_key
-  private_key = var.mongodbatlas_private_key
-}
+# provider "mongodbatlas" {
+#   public_key  = var.mongodbatlas_public_key
+#   private_key = var.mongodbatlas_private_key
+# }
 
 # mongodb atlas
 
-resource "mongodbatlas_project" "atlas_project" {
-  name   = "voc-app"
-  org_id = var.atlas_org_id
-}
+# resource "mongodbatlas_project" "atlas_project" {
+#   name   = "voc-app"
+#   org_id = var.atlas_org_id
+# }
 
-resource "mongodbatlas_cluster" "cluster-atlas" {
-  project_id   = mongodbatlas_project.atlas_project.id
-  name         = "shared-cluster"
-  cluster_type = "REPLICASET"
+# resource "mongodbatlas_cluster" "cluster-atlas" {
+#   project_id   = mongodbatlas_project.atlas_project.id
+#   name         = "shared-cluster"
+#   cluster_type = "REPLICASET"
 
-  mongo_db_major_version = "5.0"
+#   mongo_db_major_version = "5.0"
 
-  # Provider Settings "block"
-  provider_name               = "TENANT"
-  backing_provider_name       = "AZURE"
-  provider_instance_size_name = "M0"
-  provider_region_name        = "EUROPE_NORTH"
-}
+#   # Provider Settings "block"
+#   provider_name               = "TENANT"
+#   backing_provider_name       = "AZURE"
+#   provider_instance_size_name = "M0"
+#   provider_region_name        = "EUROPE_NORTH"
+# }
 
-resource "random_password" "atlas_dbpassword" {
-  length  = 16
-  special = false
-}
+# resource "random_password" "atlas_dbpassword" {
+#   length  = 16
+#   special = false
+# }
 
-resource "mongodbatlas_database_user" "voc-app-user" {
-  username = var.atlas_dbuser
-  password = random_password.atlas_dbpassword.result
+# resource "mongodbatlas_database_user" "voc-app-user" {
+#   username = var.atlas_dbuser
+#   password = random_password.atlas_dbpassword.result
 
-  auth_database_name = "admin"
-  project_id         = mongodbatlas_project.atlas_project.id
+#   auth_database_name = "admin"
+#   project_id         = mongodbatlas_project.atlas_project.id
 
-  roles {
-    role_name     = "readWrite"
-    database_name = var.db_name
-  }
-  depends_on = [mongodbatlas_project.atlas_project]
-}
+#   roles {
+#     role_name     = "readWrite"
+#     database_name = var.db_name
+#   }
+#   depends_on = [mongodbatlas_project.atlas_project]
+# }
 
 resource "azurerm_resource_group" "vocappgroup" {
   name     = "VocAppGroup"
@@ -200,20 +200,20 @@ resource "azurerm_app_service_plan" "vocapp" {
   }
 }
 
-locals {
-  con = split("?", azurerm_cosmosdb_account.cosmosaccount.connection_strings[0])
-}
+# locals {
+#   con = split("?", azurerm_cosmosdb_account.cosmosaccount.connection_strings[0])
+# }
 
-locals {
-  con_parts = split("://", mongodbatlas_cluster.cluster-atlas.srv_address)
-  atlas_connection = format("%s://%s:%s@%s/%s?%s",
-    local.con_parts[0],
-    mongodbatlas_database_user.voc-app-user.username,
-    mongodbatlas_database_user.voc-app-user.password,
-    local.con_parts[1],
-    var.db_name,
-  "retryWrites=true&w=majority")
-}
+# locals {
+#   con_parts = split("://", mongodbatlas_cluster.cluster-atlas.srv_address)
+#   atlas_connection = format("%s://%s:%s@%s/%s?%s",
+#     local.con_parts[0],
+#     mongodbatlas_database_user.voc-app-user.username,
+#     mongodbatlas_database_user.voc-app-user.password,
+#     local.con_parts[1],
+#     var.db_name,
+#   "retryWrites=true&w=majority")
+# }
 
 resource "azurerm_app_service" "vocappservice" {
   name                = var.webapp_name
@@ -224,9 +224,9 @@ resource "azurerm_app_service" "vocappservice" {
 
   app_settings = {
     "DeployDate"                      = timestamp()
-    "DATABASE_URL"                    = local.atlas_connection
-    "test_var1"                       = local.test_var1
-    "test_tf_var1"                    = local.test_tf_var1
+    # "DATABASE_URL"                    = local.atlas_connection
+    "TEST_VAR1"                       = local.test_var1
+    "TEST_TF_VAR1"                    = local.test_tf_var1
   }
 
   site_config {
