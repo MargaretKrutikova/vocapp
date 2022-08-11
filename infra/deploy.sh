@@ -20,21 +20,23 @@ export ARM_ACCESS_KEY=$ACCOUNT_KEY
 echo "Testing vars:"
 
 echo "test_var1:"
+echo $test_var1
 echo $(test_var1)
 
 echo "TF_VAR_test_tf_var1:"
+echo $TF_VAR_test_tf_var1
 echo $(TF_VAR_test_tf_var1)
 
-terraform plan \
-  -var "atlas_org_id=$ATLAS_ORG_ID" \
-  -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
-  -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
-  --out=main.tfplan
+# terraform plan \
+#   -var "atlas_org_id=$ATLAS_ORG_ID" \
+#   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
+#   -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
+#   --out=main.tfplan
 
-terraform apply main.tfplan
+# terraform apply main.tfplan
 
-az webapp deploy \
-    --resource-group "VocAppGroup" \
-    --name "vocwebapp" \
-    --type=zip \
-    --src-path $PUBLISH_FILE
+# az webapp deploy \
+#     --resource-group "VocAppGroup" \
+#     --name "vocwebapp" \
+#     --type=zip \
+#     --src-path $PUBLISH_FILE
