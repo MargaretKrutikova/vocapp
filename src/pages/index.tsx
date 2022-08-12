@@ -1,17 +1,5 @@
-import type { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
-
-export const getServerSideProps = () => {
-  const testVar1 = process.env.TEST_VAR1;
-  const tfTestVar1 = process.env.TEST_TF_VAR1;
-
-  return { props: { testVar1, tfTestVar1 } };
-};
-
-type Props = {
-  testVar1: string;
-  tfTestVar1: string;
-};
 
 type TechnologyCardProps = {
   name: string;
@@ -19,7 +7,7 @@ type TechnologyCardProps = {
   link: string;
 };
 
-const Home: NextPage<Props> = (props) => {
+const Home: NextPage = () => {
   return (
     <>
       <Head>
@@ -32,10 +20,6 @@ const Home: NextPage<Props> = (props) => {
       </Head>
 
       <main className="container mx-auto flex flex-col items-center justify-center h-screen p-4">
-        <div>
-          test_var1: {props.testVar1}
-          test_tf_var1: {props.tfTestVar1}
-        </div>
         <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700">
           <span className="text-purple-300">Voc</span> App
         </h1>
