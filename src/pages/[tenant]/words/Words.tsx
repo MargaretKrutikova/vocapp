@@ -8,31 +8,7 @@ import { useWordForm } from "../../../hooks/useWordForm";
 import { WordForm } from "../../../components/WordForm";
 import { TextField } from "../../../components/TextField";
 import { VocItem, VocValue } from "@prisma/client";
-
-const transformText = (text: string) =>
-  text
-    .trim()
-    .toLocaleLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
-
-const searchIsInVocItems = (vocItems: VocItem[], searchQuery: string) =>
-  vocItems.some((item) => transformText(item.value).includes(searchQuery));
-
-const filterWords = (wordsToFilter: VocValue[], searchQuery: string) => {
-  const query = searchQuery ? searchQuery.trim().toLocaleLowerCase() : "";
-
-  if (wordsToFilter && query) {
-    return wordsToFilter.filter(
-      (w) =>
-        transformText(w.value).includes(query) ||
-        searchIsInVocItems(w.translations, query) ||
-        searchIsInVocItems(w.explanations, query) ||
-        searchIsInVocItems(w.usages, query)
-    );
-  }
-  return wordsToFilter;
-};
+import WordsList from "./WordsList";
 
 export default function Words() {
   const router = useRouter();
@@ -55,7 +31,6 @@ export default function Words() {
     });
 
   const [wordState, dispatch] = useWordForm();
-  const [searchQuery, setSearchQuery] = useState("");
 
   const canAddWord =
     !(isLoadingWords || isAddingWord || isRefetchingWords) &&
@@ -93,56 +68,15 @@ export default function Words() {
         </Link>
       </h6>
 
-      {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
-
       <div>
-        <TextField value={searchQuery} onTextChange={setSearchQuery} />
-        <div className="pt-6 text-2xl text-violet-500 flex-col flex w-full ml-4 mb-6">
-          {words
-            ? filterWords(words, searchQuery).map((w) => (
-                <div key={w.id}>
-                  <div className="flex">
-                    {w.value}
-                    <button
-                      className="px-4"
-                      onClick={() => {
-                        router.push(`/${tenant}/${w.id}`);
-                      }}
-                    >
-                      ✎
-                    </button>
-                  </div>
-                  <div className="text-lg">
-                    {w.translations.map((t) => (
-                      <div key={t.language}>
-                        {t.language}: {t.value}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-sm">
-                    {w.explanations.map((t) => (
-                      <div key={t.language}>
-                        {t.language}: {t.value}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-sm">
-                    {w.usages.map((t) => (
-                      <div key={t.language}>
-                        {t.language}: {t.value}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            : null}
-        </div>
         <WordForm
           dispatch={dispatch}
           state={wordState}
           canSaveWord={canAddWord}
           onSave={addWord}
         />
+        {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
+        {words ? <WordsList words={[...words].reverse()} /> : null}
       </div>
     </div>
   );

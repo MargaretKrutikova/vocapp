@@ -13,7 +13,7 @@ type Props = {
 
 export const WordForm = ({ state, dispatch, canSaveWord, onSave }: Props) => {
   return (
-    <div>
+    <div className="m-2">
       <div className="flex">
         <TextField
           autoFocus={true}
