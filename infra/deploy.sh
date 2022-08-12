@@ -37,16 +37,29 @@ echo $MONGODBATLAS_PRIVATE_KEY
 echo "MONGODBATLAS_PUBLIC_KEY:"
 echo $MONGODBATLAS_PUBLIC_KEY
 
-terraform plan \
-  -var "atlas_org_id=$ATLAS_ORG_ID" \
-  -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
-  -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
-  --out=main.tfplan
+echo "IP: "
+ifconfig
 
-terraform apply main.tfplan
+echo "curl1:"
+curl -v \
+  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e/databaseUsers/admin/voc-app-user' \
+  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
 
-az webapp deploy \
-    --resource-group "VocAppGroup" \
-    --name "vocwebapp" \
-    --type=zip \
-    --src-path $PUBLISH_FILE
+echo "curl2:"
+curl -v \
+  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e' \
+  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
+
+# terraform plan \
+#   -var "atlas_org_id=$ATLAS_ORG_ID" \
+#   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
+#   -var "mongodbatlas_public_key=$MONGODBATLAS_PUBLIC_KEY" \
+#   --out=main.tfplan
+
+# terraform apply main.tfplan
+
+# az webapp deploy \
+#     --resource-group "VocAppGroup" \
+#     --name "vocwebapp" \
+#     --type=zip \
+#     --src-path $PUBLISH_FILE
