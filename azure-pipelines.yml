@@ -39,6 +39,7 @@ stages:
             scriptType: bash
             workingDirectory: $(System.DefaultWorkingDirectory)/infra
             scriptPath: $(System.DefaultWorkingDirectory)/infra/atlas_test.sh
+            arguments: $(KYA_PUBLIC_KEY) $(KYA_PRIVATE_KEY)
 
 # - stage: Build
 #   displayName: Build stage
