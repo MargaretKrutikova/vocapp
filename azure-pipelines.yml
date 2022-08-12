@@ -21,83 +21,102 @@ variables:
   vmImageName: 'ubuntu-latest'
 
 stages:
-- stage: Build
-  displayName: Build stage
+- stage: AtlasTestStasge
+  displayName: Atlas Test stage
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+    - job: AtlastTestJob
+      displayName: Atlas test job
+      pool:
+        vmImage: $(vmImageName)
 
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '16.x'
-      displayName: 'Install Node.js'
+      steps:
+        - task: AzureCLI@2
+          name: atlas_test_step
+          displayName: Atlas test step
+          inputs:
+            azureSubscription: $(azureSubscription)
+            addSpnToEnvironment: true
+            scriptType: bash
+            workingDirectory: $(System.DefaultWorkingDirectory)/infra
+            scriptPath: $(System.DefaultWorkingDirectory)/infra/atlas_test.sh
 
-    - task: Bash@3
-      inputs:
-        filePath: $(System.DefaultWorkingDirectory)/infra/build.sh
-      displayName: 'Build Nextjs app'
+# - stage: Build
+#   displayName: Build stage
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: $(vmImageName)
 
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/packaged'
-        includeRootFolder: true
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
+#     steps:
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '16.x'
+#       displayName: 'Install Node.js'
 
-    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      artifact: drop
+#     - task: Bash@3
+#       inputs:
+#         filePath: $(System.DefaultWorkingDirectory)/infra/build.sh
+#       displayName: 'Build Nextjs app'
 
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - job: Deploy
-    displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
+#     - task: ArchiveFiles@2
+#       displayName: 'Archive files'
+#       inputs:
+#         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/packaged'
+#         includeRootFolder: true
+#         archiveType: zip
+#         archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+#         replaceExistingArchive: true
 
-    steps:
-      - download: current
-        artifact: drop
-      - task: TerraformInstaller@0
-        displayName: Install Terraform
-        inputs:
-          terraformVersion: "1.2.6"
+#     - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+#       artifact: drop
+
+# - stage: Deploy
+#   displayName: Deploy stage
+#   dependsOn: Build
+#   condition: succeeded()
+#   jobs:
+#   - job: Deploy
+#     displayName: Deploy
+#     pool:
+#       vmImage: $(vmImageName)
+
+#     steps:
+#       - download: current
+#         artifact: drop
+#       - task: TerraformInstaller@0
+#         displayName: Install Terraform
+#         inputs:
+#           terraformVersion: "1.2.6"
       
-      - task: AzureCLI@2
-        name: terraform_init
-        displayName: "terraform init"
-        inputs:
-          failOnStandardError: true
-          azureSubscription: $(azureSubscription)
-          scriptType: bash
-          workingDirectory: $(System.DefaultWorkingDirectory)/infra
-          scriptPath: $(System.DefaultWorkingDirectory)/infra/terraform_init.sh
+#       - task: AzureCLI@2
+#         name: terraform_init
+#         displayName: "terraform init"
+#         inputs:
+#           failOnStandardError: true
+#           azureSubscription: $(azureSubscription)
+#           scriptType: bash
+#           workingDirectory: $(System.DefaultWorkingDirectory)/infra
+#           scriptPath: $(System.DefaultWorkingDirectory)/infra/terraform_init.sh
           
-      - task: AzureCLI@2
-        name: terraform_deploy
-        displayName: Build and deploy with Terraform
-        inputs:
-          azureSubscription: $(azureSubscription)
-          addSpnToEnvironment: true
-          scriptType: bash
-          workingDirectory: $(System.DefaultWorkingDirectory)/infra
-          scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
-          arguments: |
-            $(Pipeline.Workspace)/drop/$(Build.BuildId).zip $(ATLAS_ORG_ID) $(MONGODBATLAS_PUBLIC_KEY) $(MONGODBATLAS_PRIVATE_KEY)
+#       - task: AzureCLI@2
+#         name: terraform_deploy
+#         displayName: Build and deploy with Terraform
+#         inputs:
+#           azureSubscription: $(azureSubscription)
+#           addSpnToEnvironment: true
+#           scriptType: bash
+#           workingDirectory: $(System.DefaultWorkingDirectory)/infra
+#           scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
+#           arguments: |
+#             $(Pipeline.Workspace)/drop/$(Build.BuildId).zip $(ATLAS_ORG_ID) $(MONGODBATLAS_PUBLIC_KEY) $(MONGODBATLAS_PRIVATE_KEY)
     
-    # - task: AzureWebApp@1
-    #   displayName: 'Azure Web App Deploy: vocwebapp'
-    #   inputs:
-    #     azureSubscription: $(azureSubscription)
-    #     appType: webAppLinux
-    #     appName: $(webAppName)
-    #     runtimeStack: 'NODE|16-lts'
-    #     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-    #     startUpCommand: 'npm run start'
+#     # - task: AzureWebApp@1
+#     #   displayName: 'Azure Web App Deploy: vocwebapp'
+#     #   inputs:
+#     #     azureSubscription: $(azureSubscription)
+#     #     appType: webAppLinux
+#     #     appName: $(webAppName)
+#     #     runtimeStack: 'NODE|16-lts'
+#     #     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+#     #     startUpCommand: 'npm run start'
