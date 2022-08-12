@@ -20,26 +20,6 @@ variables:
   vmImageName: "ubuntu-latest"
 
 stages:
-  # - stage: AtlasTestStasge
-  #   displayName: Atlas Test stage
-  #   jobs:
-  #     - job: AtlastTestJob
-  #       displayName: Atlas test job
-  #       pool:
-  #         vmImage: $(vmImageName)
-
-  #       steps:
-  #         - task: AzureCLI@2
-  #           name: atlas_test_step
-  #           displayName: Atlas test step
-  #           inputs:
-  #             azureSubscription: $(azureSubscription)
-  #             addSpnToEnvironment: true
-  #             scriptType: bash
-  #             workingDirectory: $(System.DefaultWorkingDirectory)/infra
-  #             scriptPath: $(System.DefaultWorkingDirectory)/infra/atlas_test.sh
-  #             arguments: $(KYA_PUBLIC_KEY) $(KYA_PRIVATE_KEY)
-
   - stage: Build
     displayName: Build stage
     jobs:
@@ -110,13 +90,3 @@ stages:
               scriptPath: $(System.DefaultWorkingDirectory)/infra/deploy.sh
               arguments: |
                 $(Pipeline.Workspace)/drop/$(Build.BuildId).zip $(ATLAS_ORG_ID) $(MONGODBATLAS_PUBLIC_KEY) $(MONGODBATLAS_PRIVATE_KEY)
-
-        # - task: AzureWebApp@1
-        #   displayName: 'Azure Web App Deploy: vocwebapp'
-        #   inputs:
-        #     azureSubscription: $(azureSubscription)
-        #     appType: webAppLinux
-        #     appName: $(webAppName)
-        #     runtimeStack: 'NODE|16-lts'
-        #     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-        #     startUpCommand: 'npm run start'

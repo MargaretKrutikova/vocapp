@@ -18,35 +18,6 @@ CONTAINER_NAME=tfstate
 ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 
-# terraform plan --out=main.tfplan
-
-echo "Testing vars:"
-
-echo "TEST_VAR1:"
-echo $TEST_VAR1
-
-echo "TF_VAR_TEST_TF_VAR1:"
-echo $TF_VAR_TEST_TF_VAR1
-
-echo "ATLAS_ORG_ID:"
-echo $ATLAS_ORG_ID
-
-echo "MONGODBATLAS_PRIVATE_KEY:"
-echo $MONGODBATLAS_PRIVATE_KEY
-
-echo "MONGODBATLAS_PUBLIC_KEY:"
-echo $MONGODBATLAS_PUBLIC_KEY
-
-echo "curl1:"
-curl -v \
-  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e/databaseUsers/admin/voc-app-user' \
-  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
-
-echo "curl2:"
-curl -v \
-  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e' \
-  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
-
 terraform plan \
   -var "atlas_org_id=$ATLAS_ORG_ID" \
   -var "mongodbatlas_private_key=$MONGODBATLAS_PRIVATE_KEY" \
