@@ -1,13 +1,13 @@
 #!/bin/bash
 
-KYA_PRIVATE_KEY=$1
-KYA_PUBLIC_KEY=$2
-
-echo "KYA_PRIVATE_KEY:"
-echo $KYA_PRIVATE_KEY
+KYA_PUBLIC_KEY=$1
+KYA_PRIVATE_KEY=$2
 
 echo "KYA_PUBLIC_KEY:"
 echo $KYA_PUBLIC_KEY
+
+echo "KYA_PRIVATE_KEY:"
+echo $KYA_PRIVATE_KEY
 
 # echo "IP: "
 # ifconfig
