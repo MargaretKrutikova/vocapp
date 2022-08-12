@@ -37,18 +37,29 @@ echo $MONGODBATLAS_PRIVATE_KEY
 echo "MONGODBATLAS_PUBLIC_KEY:"
 echo $MONGODBATLAS_PUBLIC_KEY
 
-echo "IP: "
-ifconfig
+echo "KYA_PRIVATE_KEY:"
+echo $KYA_PRIVATE_KEY
 
-echo "curl1:"
-curl -v \
-  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e/databaseUsers/admin/voc-app-user' \
-  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
+echo "KYA_PUBLIC_KEY:"
+echo $KYA_PUBLIC_KEY
 
-echo "curl2:"
+# echo "IP: "
+# ifconfig
+
+echo "curl groups:"
 curl -v \
-  'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e' \
-  --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
+  'https://cloud.mongodb.com/api/atlas/v1.0/groups' \
+  --digest -u $KYA_PUBLIC_KEY:$KYA_PRIVATE_KEY
+
+# echo "curl1:"
+# curl -v \
+#   'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e/databaseUsers/admin/voc-app-user' \
+#   --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
+
+# echo "curl2:"
+# curl -v \
+#   'https://cloud.mongodb.com/api/atlas/v1.0/groups/62f4e0126f8eed4dde826a6e' \
+#   --digest -u $MONGODBATLAS_PUBLIC_KEY:$MONGODBATLAS_PRIVATE_KEY
 
 # terraform plan \
 #   -var "atlas_org_id=$ATLAS_ORG_ID" \
