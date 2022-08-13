@@ -18,7 +18,7 @@ CONTAINER_NAME=tfstate
 ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 
-export TF_LOG=TRACE
+# export TF_LOG=TRACE
 
 terraform plan \
   -var "atlas_org_id=$ATLAS_ORG_ID" \
