@@ -7,6 +7,8 @@ import { trpc } from "../../../utils/trpc";
 import { useWordForm } from "../../../hooks/useWordForm";
 import { WordForm } from "../../../components/WordForm";
 import WordsList from "../../../components/WordsList";
+import { VocValue } from "@prisma/client";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 export default function Words() {
   const router = useRouter();
@@ -14,25 +16,54 @@ export default function Words() {
 
   const queryClient = useQueryClient();
   const queryName = "vocabulary.getForTenant";
+  const queryKey = [queryName, { tenant }];
 
   const {
     data: words,
     error: errorLoadingWords,
     isLoading: isLoadingWords,
-    isRefetching: isRefetchingWords,
   } = trpc.useQuery([queryName, { tenant }]);
   const { mutate: performAddWordMutation, isLoading: isAddingWord } =
     trpc.useMutation(["vocabulary.add"], {
-      onSuccess: () => {
-        queryClient.invalidateQueries([queryName]);
+      onMutate: async (newWord) => {
+        await queryClient.cancelQueries(queryKey);
+        const previousWords = queryClient.getQueryData<VocValue[]>(queryKey);
+
+        const tempId = Math.random().toString();
+        queryClient.setQueryData<VocValue[]>(queryKey, (oldWords) => [
+          ...(oldWords ?? []),
+          { ...newWord, id: tempId, dateAdded: new Date(), dateUpdated: null },
+        ]);
+
+        return { id: tempId, previousWords };
+      },
+      onError: (err, newWord, context) => {
+        if (context?.previousWords) {
+          queryClient.setQueryData<VocValue[]>(queryKey, context.previousWords);
+        }
+      },
+      onSettled: (data, error, _, context) => {
+        if (error) {
+          console.log("Error adding word", error.message);
+          queryClient.invalidateQueries(queryKey);
+        }
+
+        if (context?.id === undefined || data?.id === undefined) return;
+
+        queryClient.setQueryData<VocValue[]>(
+          queryKey,
+          (oldWords) =>
+            oldWords?.map((oldWord) =>
+              oldWord.id === context.id ? { ...oldWord, id: data.id } : oldWord
+            ) ?? []
+        );
       },
     });
 
   const [wordState, dispatch] = useWordForm();
 
   const canAddWord =
-    !(isLoadingWords || isAddingWord || isRefetchingWords) &&
-    wordState.word.length > 0;
+    !(isLoadingWords || isAddingWord) && wordState.word.length > 0;
 
   const addWord = () => {
     if (canAddWord) {
@@ -66,6 +97,10 @@ export default function Words() {
         </Link>
       </h6>
 
+      {process.env.NODE_ENV !== "production" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+
       <div>
         <WordForm
           dispatch={dispatch}
@@ -73,7 +108,7 @@ export default function Words() {
           canSaveWord={canAddWord}
           onSave={addWord}
         />
-        {isRefetchingWords || isAddingWord ? <div>Spinner</div> : null}
+        {isAddingWord ? <div>Spinner</div> : null}
         {words ? <WordsList words={[...words].reverse()} /> : null}
       </div>
     </div>
