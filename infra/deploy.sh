@@ -30,9 +30,11 @@ terraform apply main.tfplan
 
 echo "Terraform apply completed"
 
-echo "Deploying the web app"
+echo "Deploying the web app: $PUBLISH_FILE"
 az webapp deploy \
     --resource-group "VocAppGroup" \
     --name "vocwebapp" \
     --type=zip \
+    --verbose \
+    --debug \
     --src-path $PUBLISH_FILE
