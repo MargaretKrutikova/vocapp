@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import { useQueryClient } from "react-query";
 import { mapLanguageValues } from "../../../languages";
 import { trpc } from "../../../utils/trpc";
 import { useWordForm } from "../../../hooks/useWordForm";
 import { WordForm } from "../../../components/WordForm";
-import { TextField } from "../../../components/TextField";
-import { VocItem, VocValue } from "@prisma/client";
-import WordsList from "./WordsList";
+import WordsList from "../../../components/WordsList";
 
 export default function Words() {
   const router = useRouter();

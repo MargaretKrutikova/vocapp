@@ -1,7 +1,7 @@
 import { VocItem, VocValue } from "@prisma/client";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { TextField } from "../../../components/TextField";
+import { TextField } from "./TextField";
 
 type Props = {
   words: VocValue[];
