@@ -58,6 +58,7 @@ export const vocRouter = createRouter()
           translations,
           explanations,
           usages,
+          dateUpdated: new Date(),
         },
         where: { id },
       });
