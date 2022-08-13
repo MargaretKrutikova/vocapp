@@ -28,6 +28,9 @@ terraform plan \
 
 terraform apply main.tfplan
 
+echo "Terraform apply completed"
+
+echo "Deploying the web app"
 az webapp deploy \
     --resource-group "VocAppGroup" \
     --name "vocwebapp" \
