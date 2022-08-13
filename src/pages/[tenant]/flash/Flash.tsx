@@ -1,5 +1,7 @@
+import { VocValue } from "@prisma/client";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "../../../utils/trpc";
 
 export default function FlashCard() {
@@ -8,38 +10,60 @@ export default function FlashCard() {
 
   const [isInFlippedMode, setIsInFlippedMode] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [previousWords, setPreviousWords] = useState<string[]>([]);
+  const [previousWords, setPreviousWords] = useState<VocValue[]>([]);
+  const [currentWord, setCurrentWord] = useState<VocValue | null>(null);
 
   const {
-    data: word,
-    error: errorLoadingWord,
-    isLoading: isLoadingWord,
-    isRefetching: isRefetchingWord,
-    refetch,
-  } = trpc.useQuery([
-    "vocabulary.getRandomForTenant",
-    { tenant, previousWords },
-  ]);
+    data: words,
+    error: errorLoadingWords,
+    isLoading: isLoadingWords,
+  } = trpc.useQuery(["vocabulary.getForTenant", { tenant }]);
 
-  const anotherRandomWord = (currentWord: string) => {
+  const anotherRandomWord = (currentWord: VocValue) => {
     setIsRevealed(false);
-    setPreviousWords((prevWords) => [currentWord, ...prevWords].slice(0, 2));
-    refetch();
+    setPreviousWords((prevWords) => [currentWord, ...prevWords]);
   };
 
-  if (errorLoadingWord) return <div>Error!</div>;
+  useEffect(() => {
+    if (words !== undefined) {
+      const randomVal = Math.floor(
+        (words.length - previousWords.length) * Math.random()
+      );
+      const newWord = words.filter((w) => !previousWords.includes(w))[
+        randomVal
+      ];
+      if (newWord === undefined) {
+        setPreviousWords([]);
+        setCurrentWord(null);
+      } else {
+        setCurrentWord(newWord);
+      }
+    }
+  }, [words, previousWords]);
 
-  const translationsList = word?.translations.map((t) => (
+  if (errorLoadingWords) return <div>Error!</div>;
+
+  const translationsList = currentWord?.translations.map((t) => (
     <div key={t.value}>{t.value}</div>
   ));
 
-  const mainCardContents = isInFlippedMode ? translationsList : word?.value;
-  const revealedContents = isInFlippedMode ? word?.value : translationsList;
+  const mainCardContents = isInFlippedMode
+    ? translationsList
+    : currentWord?.value;
+  const revealedContents = isInFlippedMode
+    ? currentWord?.value
+    : translationsList;
 
   return (
     <div>
       <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
-        Flashcards for {tenant}
+        <span>
+          Flashcards for{" "}
+          <Link href={`/${tenant}/words`}>
+            <a className="underline text-blue-800">{tenant}</a>
+          </Link>
+          . Total: {words?.length}. Covered: {previousWords.length}
+        </span>
         <button
           className="border-black border-2"
           onClick={() => setIsInFlippedMode((prevValue) => !prevValue)}
@@ -47,7 +71,7 @@ export default function FlashCard() {
           {isInFlippedMode ? "Flipped" : "Normal"}
         </button>
       </h6>
-      {isLoadingWord || isRefetchingWord || word === undefined ? (
+      {isLoadingWords || currentWord === null ? (
         <div>Spinner...</div>
       ) : (
         <div className="flex flex-col justify-center">
@@ -62,7 +86,7 @@ export default function FlashCard() {
           </button>
           <br />
           <button
-            onClick={() => anotherRandomWord(word.value)}
+            onClick={() => anotherRandomWord(currentWord)}
             className="border-green-800 border-2 m-4 h-20"
           >
             NEXT
