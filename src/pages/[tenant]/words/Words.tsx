@@ -37,7 +37,7 @@ export default function Words() {
 
         return { id: tempId, previousWords };
       },
-      onError: (err, newWord, context) => {
+      onError: (_err, _newWord, context) => {
         if (context?.previousWords) {
           queryClient.setQueryData<VocValue[]>(queryKey, context.previousWords);
         }
@@ -109,7 +109,9 @@ export default function Words() {
           onSave={addWord}
         />
         {isAddingWord ? <div>Spinner</div> : null}
-        {words ? <WordsList words={[...words].reverse()} /> : null}
+        {words ? (
+          <WordsList words={[...words].reverse()} isDisabled={isAddingWord} />
+        ) : null}
       </div>
     </div>
   );

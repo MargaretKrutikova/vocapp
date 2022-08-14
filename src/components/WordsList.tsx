@@ -5,6 +5,7 @@ import { TextField } from "./TextField";
 
 type Props = {
   words: VocValue[];
+  isDisabled: boolean;
 };
 
 const transformText = (text: string) =>
@@ -32,7 +33,7 @@ const filterWords = (wordsToFilter: VocValue[], searchQuery: string) => {
   return wordsToFilter;
 };
 
-export default function WordsList({ words }: Props) {
+export default function WordsList({ words, isDisabled }: Props) {
   const router = useRouter();
   const tenant = router.query.tenant as string;
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,6 +52,7 @@ export default function WordsList({ words }: Props) {
               {w.value}
               <button
                 className="px-4"
+                disabled={isDisabled}
                 onClick={() => {
                   router.push(`/${tenant}/${w.id}`);
                 }}
