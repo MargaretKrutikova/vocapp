@@ -17,6 +17,7 @@ model VocValue {
     tenant       String
     value        String
     language     String
+    imageUrl     String?
     translations VocItem[]
     explanations VocItem[]
     usages       VocItem[]

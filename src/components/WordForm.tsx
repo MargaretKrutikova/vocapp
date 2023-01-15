@@ -22,6 +22,14 @@ export const WordForm = ({ state, dispatch, canSaveWord, onSave }: Props) => {
           value={state.word}
           onTextChange={(word) => dispatch({ type: "SetWord", word })}
         />
+        <TextField
+          tabIndex={1}
+          placeholder="Image URL (optional)"
+          value={state.imageUrl ?? ""}
+          onTextChange={(imageUrl) =>
+            dispatch({ type: "SetImageUrl", imageUrl })
+          }
+        />
         <LanguageSelector
           language={state.language}
           onLanguageChange={(lang) => dispatch({ type: "SetLanguage", lang })}

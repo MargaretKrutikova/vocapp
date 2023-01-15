@@ -9,6 +9,7 @@ import {
 
 export type WordFormState = {
   word: string;
+  imageUrl: string;
   language: Language;
   translations: LanguageValues;
   explanations: LanguageValues;
@@ -17,6 +18,7 @@ export type WordFormState = {
 
 export type WordFormAction =
   | { type: "SetWord"; word: string }
+  | { type: "SetImageUrl"; imageUrl: string }
   | { type: "SetLanguage"; lang: Language }
   | { type: "SetTranslations"; translations: LanguageValues }
   | { type: "SetExplanations"; explanations: LanguageValues }
@@ -31,6 +33,8 @@ const reducer: Reducer<WordFormState, WordFormAction> = (
   switch (action.type) {
     case "SetWord":
       return { ...state, word: action.word };
+    case "SetImageUrl":
+      return { ...state, imageUrl: action.imageUrl };
     case "SetLanguage":
       return { ...state, language: action.lang };
     case "SetTranslations":
@@ -48,6 +52,7 @@ const reducer: Reducer<WordFormState, WordFormAction> = (
 
 const createInitWordFormState = (): WordFormState => ({
   word: "",
+  imageUrl: "",
   language: "es",
   translations: createEmptyLanguageValues(),
   explanations: createEmptyLanguageValues(),
@@ -56,6 +61,7 @@ const createInitWordFormState = (): WordFormState => ({
 
 const createStateFromVocValue = (vocValue: VocValue): WordFormState => ({
   word: vocValue.value,
+  imageUrl: vocValue.imageUrl ?? "",
   language: vocValue.language as Language,
   translations: createLanguageValuesFromVocItems(vocValue.translations),
   explanations: createLanguageValuesFromVocItems(vocValue.explanations),

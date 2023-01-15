@@ -34,6 +34,7 @@ export default function EditWord() {
       performEditWordMutation({
         id,
         value: wordState.word.trim(),
+        imageUrl: wordState.imageUrl,
         language: wordState.language,
         translations: mapLanguageValues(wordState.translations),
         explanations: mapLanguageValues(wordState.explanations),

@@ -7,6 +7,7 @@ export const vocRouter = createRouter()
     input: z.object({
       tenant: z.string(),
       value: z.string(),
+      imageUrl: z.string(),
       translations: z.array(
         z.object({ value: z.string(), language: z.string() })
       ),
@@ -17,12 +18,21 @@ export const vocRouter = createRouter()
       language: z.string(),
     }),
     resolve: async ({
-      input: { value, tenant, language, translations, explanations, usages },
+      input: {
+        value,
+        imageUrl,
+        tenant,
+        language,
+        translations,
+        explanations,
+        usages,
+      },
       ctx,
     }) => {
       const result = await ctx.prisma.vocValue.create({
         data: {
           value,
+          imageUrl,
           tenant,
           language,
           translations,
@@ -38,6 +48,7 @@ export const vocRouter = createRouter()
     input: z.object({
       id: z.string(),
       value: z.string(),
+      imageUrl: z.string(),
       translations: z.array(
         z.object({ value: z.string(), language: z.string() })
       ),
@@ -48,12 +59,21 @@ export const vocRouter = createRouter()
       language: z.string(),
     }),
     resolve: async ({
-      input: { id, value, language, translations, explanations, usages },
+      input: {
+        id,
+        value,
+        imageUrl,
+        language,
+        translations,
+        explanations,
+        usages,
+      },
       ctx,
     }) => {
       const result = await ctx.prisma.vocValue.update({
         data: {
           value,
+          imageUrl,
           language,
           translations,
           explanations,
