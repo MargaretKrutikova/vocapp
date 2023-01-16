@@ -31,7 +31,8 @@ terraform apply main.tfplan
 echo "Terraform apply completed"
 
 echo "Deploying the web app: $PUBLISH_FILE"
-az webapp deploy \
+# NOTE: Switching "az webapp deploy" to "az webapp update" in order to see if this improves the issue with flaky deploys (502)
+az webapp update \
     --resource-group "VocAppGroup" \
     --name "vocwebapp" \
     --type=zip \
