@@ -70,6 +70,7 @@ export default function Words() {
       performAddWordMutation({
         tenant,
         value: wordState.word,
+        imageUrl: wordState.imageUrl,
         language: wordState.language,
         translations: mapLanguageValues(wordState.translations),
         explanations: mapLanguageValues(wordState.explanations),
