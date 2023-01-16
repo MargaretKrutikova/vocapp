@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
     provider      = "prisma-client-js"
-    binaryTargets = ["darwin-arm64"]
+    binaryTargets = ["darwin-arm64", "debian-openssl-1.1.x"]
 }
 
 type VocItem {
