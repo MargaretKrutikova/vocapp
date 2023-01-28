@@ -93,6 +93,9 @@ export default function Words() {
     <div>
       <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
         Words in {tenant}.
+        <Link href={`/${tenant}/ssr`}>
+          <a className="border-black border-2">SSR</a>
+        </Link>
         <Link href={`/${tenant}/flash`}>
           <a className="border-black border-2">Flash</a>
         </Link>
