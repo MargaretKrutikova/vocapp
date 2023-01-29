@@ -12,7 +12,7 @@ const buttonColors = [
   "bg-green-700",
 ];
 
-export default function SsrCard() {
+export default function SrsCard() {
   const router = useRouter();
   const tenant = router.query.tenant as string;
 
