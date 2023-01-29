@@ -2,7 +2,7 @@ import { VocValue } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../../../utils/trpc";
 
 const buttonColors = [
   "bg-red-500",
@@ -15,6 +15,7 @@ const buttonColors = [
 export default function SrsCard() {
   const router = useRouter();
   const tenant = router.query.tenant as string;
+  const account = router.query.account as string;
 
   const [showText, setShowText] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -62,7 +63,7 @@ export default function SrsCard() {
     <div>
       <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
         <span>
-          Flashcards for{" "}
+          SRS for {account} in{" "}
           <Link href={`/${tenant}/words`}>
             <a className="underline text-blue-800">{tenant}</a>
           </Link>
