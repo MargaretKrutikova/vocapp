@@ -91,10 +91,10 @@ stages:
               arguments: |
                 $(Pipeline.Workspace)/drop/$(Build.BuildId).zip $(ATLAS_ORG_ID) $(MONGODBATLAS_PUBLIC_KEY) $(MONGODBATLAS_PRIVATE_KEY)
 
-          - task: AzureWebApp@1
-            inputs:
-              azureSubscription: $(azureSubscription)
-              appType: "webAppLinux"
-              appName: "vocwebapp"
-              resourceGroup: "VocAppGroup"
-              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+          # - task: AzureWebApp@1
+          #   inputs:
+          #     azureSubscription: $(azureSubscription)
+          #     appType: "webAppLinux"
+          #     appName: "vocwebapp"
+          #     resourceGroup: "VocAppGroup"
+          #     package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
