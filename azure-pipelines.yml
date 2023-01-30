@@ -96,4 +96,5 @@ stages:
               azureSubscription: $(azureSubscription)
               appType: "webAppLinux"
               appName: "vocwebapp"
+              resourceGroup: "VocAppGroup"
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
