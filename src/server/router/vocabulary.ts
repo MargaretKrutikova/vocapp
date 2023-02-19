@@ -1,8 +1,14 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import { FlashCard, VocValue } from "@prisma/client";
-import { initialCardState } from "../../pages/[tenant]/srs/[account]/srsAlgorithm";
+import {
+  CardState,
+  EvaluationScore,
+  initialCardState,
+  srsFunc,
+} from "../../srsLogic/srsAlgorithm";
 import addMinutes from "date-fns/addMinutes";
+import { getLatenessInDays, minutesFromDays } from "../../srsLogic/dateLogic";
 
 export type FlashCardWithValue = Pick<
   FlashCard,
@@ -158,7 +164,7 @@ export const vocRouter = createRouter()
           vocValueId: input.id,
           account: input.account,
           bucket: initialCardState.bucket,
-          eFactor: initialCardState.efactor,
+          eFactor: initialCardState.eFactor,
           interval: initialCardState.interval,
           tenant: input.tenant,
           isActive: true,
@@ -167,5 +173,74 @@ export const vocRouter = createRouter()
       });
 
       return { nextReviewDate: result.nextReviewDate };
+    },
+  })
+  .mutation("updateFlashCard", {
+    input: z.object({
+      id: z.string(),
+      tenant: z.string(),
+      account: z.string(),
+      score: z.coerce.number().min(1).max(5),
+    }),
+    resolve: async ({
+      ctx,
+      input,
+    }): Promise<Pick<FlashCard, "nextReviewDate">> => {
+      const previousState: CardState & Pick<FlashCard, "nextReviewDate"> =
+        await ctx.prisma.flashCard.findUniqueOrThrow({
+          where: { vocValueId: input.id },
+          select: {
+            bucket: true,
+            eFactor: true,
+            interval: true,
+            nextReviewDate: true,
+          },
+        });
+
+      const now = new Date();
+      const lateness = getLatenessInDays(
+        previousState.nextReviewDate,
+        previousState.interval,
+        now
+      );
+
+      const newState = srsFunc(Math.random, previousState, {
+        score: input.score as EvaluationScore, // TODO: Consider type guards
+        lateness,
+      });
+
+      const nextReviewDate = addMinutes(
+        now,
+        minutesFromDays(newState.interval)
+      );
+
+      const updatedFlashCardDate = await ctx.prisma.flashCard.update({
+        where: { vocValueId: input.id },
+        data: {
+          bucket: newState.bucket,
+          eFactor: newState.eFactor,
+          interval: newState.interval,
+          nextReviewDate,
+        },
+        select: {
+          nextReviewDate: true,
+        },
+      });
+
+      // TODO: Add an entry to the Attempts collection
+      // const result: FlashCard = await ctx.prisma.flashCard.create({
+      //   data: {
+      //     vocValueId: input.id,
+      //     account: input.account,
+      //     bucket: initialCardState.bucket,
+      //     eFactor: initialCardState.efactor,
+      //     interval: initialCardState.interval,
+      //     tenant: input.tenant,
+      //     isActive: true,
+      //     nextReviewDate: addMinutes(new Date(), 1),
+      //   },
+      // });
+
+      return { nextReviewDate: updatedFlashCardDate.nextReviewDate };
     },
   });

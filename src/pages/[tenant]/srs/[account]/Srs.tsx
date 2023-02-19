@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { EvaluationScore } from "../../../../srsLogic/srsAlgorithm";
 import { trpc } from "../../../../utils/trpc";
 
 const buttonColors = [
@@ -19,6 +20,8 @@ const gradingTable: Record<number, string> = {
   5: "Easy",
 };
 
+const evaluationScores: Array<EvaluationScore> = [1, 2, 3, 4, 5];
+
 export default function SrsCard() {
   const router = useRouter();
   const tenant = router.query.tenant as string;
@@ -27,6 +30,7 @@ export default function SrsCard() {
   const [showText, setShowText] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [score, setScore] = useState<EvaluationScore | null>(null);
 
   const {
     data: flashCards,
@@ -34,9 +38,11 @@ export default function SrsCard() {
     isLoading: isLoadingCards,
   } = trpc.useQuery(["vocabulary.getFlashCardsToReview", { tenant, account }]);
 
+  const { mutateAsync: updateFlashCard, isLoading: isUpdatingFlashCard } =
+    trpc.useMutation(["vocabulary.updateFlashCard"]);
+
   if (errorLoadingCards) return <div>Error!</div>;
 
-  console.log({ flashCards });
   const currentCard = flashCards?.[currentIndex] ?? null;
 
   const translationsList = currentCard?.vocValue.translations.map((t) => (
@@ -96,20 +102,18 @@ export default function SrsCard() {
 
           {isRevealed ? (
             <div>
-              {[0, 1, 2, 3, 4].map((val) => {
+              {evaluationScores.map((val) => {
                 return (
                   <button
                     key={val}
-                    className={`border-2 ${buttonColors[val]} w-1/5 h-20`}
-                    onClick={() => {
-                      console.log(val);
-                    }}
+                    className={`border-${val === score ? "2" : "2"} border-${
+                      val === score ? "blue-500" : "white"
+                    } ${buttonColors[val - 1]} w-1/5 h-20`}
+                    onClick={() => setScore(val)}
                   >
-                    {val + 1}
+                    {val}
                     <br />
-                    <span style={{ fontSize: 10 }}>
-                      {gradingTable[val + 1]}
-                    </span>
+                    <span style={{ fontSize: 10 }}>{gradingTable[val]}</span>
                   </button>
                 );
               })}
@@ -120,18 +124,25 @@ export default function SrsCard() {
           ) : (
             <button
               onClick={() => {
-                setIsRevealed(false);
+                if (currentCard === null || score === null) return; // TODO: Handle it higher up
 
-                // TODO: Report score -> Add to attempts collection
-                // TODO: Run through SRS Algorithm
-                // TODO: Update FlashCard with CardState (bucket, eFactor and nextReviewDate)
-
-                setCurrentIndex((oldIndex) => oldIndex + 1);
-                if (reviewDone()) return;
+                updateFlashCard({
+                  id: currentCard.vocValueId,
+                  account,
+                  tenant,
+                  score,
+                })
+                  .then((_res) => {
+                    setIsRevealed(false);
+                    setCurrentIndex((oldIndex) => oldIndex + 1);
+                  })
+                  .catch((err) => {
+                    console.log("Error updating FlashCard: ", err);
+                  });
               }}
               className="border-green-800 border-2 m-4 h-20 fixed bottom-0 center w-11/12"
             >
-              NEXT
+              {isUpdatingFlashCard ? "Saving..." : "NEXT"}
             </button>
           )}
         </div>

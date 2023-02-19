@@ -1,6 +1,8 @@
+import { daysFromMinutes } from "./dateLogic";
+
 export type CardState = {
   bucket: number;
-  efactor: number;
+  eFactor: number;
   interval: number;
 };
 
@@ -41,31 +43,33 @@ const getFuzzInterval = (n: number) => {
   }
 };
 
-export const daysFromMinutes = (min: number) => min / (24.0 * 60.0);
-
 function learningPhaseState(
-  previousN: number,
+  previousBucket: number,
   score: EvaluationScore,
-  efactor: number
+  previousEfactor: number
 ): CardState {
-  const incrementedN = previousN + 1;
+  const incrementedBucket = previousBucket + 1;
   switch (score) {
     case 1:
     case 2:
       return {
         bucket: 0,
-        efactor,
+        eFactor: previousEfactor,
         interval: daysFromMinutes(1.0),
       };
     case 3:
     case 4:
       return {
-        bucket: incrementedN,
-        efactor,
-        interval: getFuzzInterval(incrementedN),
+        bucket: incrementedBucket,
+        eFactor: previousEfactor,
+        interval: getFuzzInterval(incrementedBucket),
       };
     case 5:
-      return { bucket: incrementedN, efactor, interval: 4.0 };
+      return {
+        bucket: incrementedBucket,
+        eFactor: previousEfactor,
+        interval: 4.0,
+      };
   }
 }
 
@@ -108,7 +112,7 @@ function getInterval(
 
 export const initialCardState: CardState = {
   bucket: 0,
-  efactor: 2.5,
+  eFactor: 2.5,
   interval: 1.0,
 };
 
@@ -122,7 +126,7 @@ export function srsFunc(
     return learningPhaseState(
       previous.bucket,
       evaluation.score,
-      previous.efactor
+      previous.eFactor
     );
   }
 
@@ -131,7 +135,7 @@ export function srsFunc(
     return {
       bucket: 0,
       interval: daysFromMinutes(1), // Reset interval to 1 minute
-      efactor: Math.max(1.3, previous.efactor - 0.2), // Reduce efactor
+      eFactor: Math.max(1.3, previous.eFactor - 0.2), // Reduce efactor
     };
   }
 
@@ -141,7 +145,7 @@ export function srsFunc(
 
   const newEfactor = Math.max(
     1.3,
-    previous.efactor +
+    previous.eFactor +
       (0.1 - (5 - evaluation.score) * (0.08 + (5 - evaluation.score) * 0.02))
   );
 
@@ -154,7 +158,7 @@ export function srsFunc(
 
   return {
     bucket: previous.bucket + 1,
-    efactor: newEfactor,
+    eFactor: newEfactor,
     interval: newInterval + fuzzForInterval(newInterval, randomFunc),
   };
 }

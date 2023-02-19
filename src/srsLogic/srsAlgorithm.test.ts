@@ -1,19 +1,17 @@
 import { test, expect } from "vitest";
+import { daysFromMinutes, minutesFromDays } from "./dateLogic";
 import {
   EvaluationScore,
   CardState,
   srsFunc,
   Evaluation,
   initialCardState,
-  daysFromMinutes,
 } from "./srsAlgorithm";
 
 const mockedRandom = () => 1;
 
 const funcUnderTest = (previous: CardState, evaluation: Evaluation) =>
   srsFunc(mockedRandom, previous, evaluation);
-
-const minutesFromDays = (days: number) => days * 24 * 60;
 
 function toMinutesIfUnder12Hours(days: number | null | undefined) {
   if (days === null || days === undefined) {
@@ -371,7 +369,7 @@ test("first time review", () => {
 
   expect(result).toEqual({
     bucket: 1,
-    efactor: 2.5,
+    eFactor: 2.5,
     interval: daysFromMinutes(1),
   });
 });
