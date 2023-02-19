@@ -1,8 +1,15 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { FlashCard, Prisma, VocValue } from "@prisma/client";
+import { FlashCard, VocValue } from "@prisma/client";
 import { initialCardState } from "../../pages/[tenant]/srs/[account]/srsAlgorithm";
 import addMinutes from "date-fns/addMinutes";
+
+export type FlashCardWithValue = Pick<
+  FlashCard,
+  "vocValueId" | "nextReviewDate"
+> & {
+  vocValue: VocValue;
+};
 
 export const vocRouter = createRouter()
   .mutation("add", {
@@ -107,28 +114,24 @@ export const vocRouter = createRouter()
       });
     },
   })
-  .query("getRandomForTenant", {
+  .query("getFlashCardsToReview", {
     input: z.object({
       tenant: z.string(),
-      previousWords: z.array(z.string()),
+      account: z.string(),
     }),
     resolve: async ({ ctx, input }) => {
-      const tenantFilter: Prisma.VocValueWhereInput = {
-        tenant: input.tenant,
-        value: { notIn: input.previousWords },
-      };
+      const flashCardsToReview: Array<FlashCardWithValue> =
+        await ctx.prisma.flashCard.findMany({
+          where: {
+            tenant: input.tenant,
+            account: input.account,
+            nextReviewDate: { lte: new Date() },
+          },
+          orderBy: { nextReviewDate: "asc" },
+          select: { vocValueId: true, vocValue: true, nextReviewDate: true },
+        });
 
-      const totalCount = await ctx.prisma.vocValue.count({
-        where: tenantFilter,
-      });
-
-      const result: VocValue[] = await ctx.prisma.vocValue.findMany({
-        where: tenantFilter,
-        skip: Math.floor(totalCount * Math.random()),
-        take: 1,
-      });
-
-      return result[0];
+      return flashCardsToReview;
     },
   })
   .mutation("addToSrs", {
