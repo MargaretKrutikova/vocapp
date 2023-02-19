@@ -1,7 +1,6 @@
-import { VocValue } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { trpc } from "../../../../utils/trpc";
 
 const buttonColors = [
@@ -12,6 +11,14 @@ const buttonColors = [
   "bg-green-700",
 ];
 
+const gradingTable: Record<number, string> = {
+  1: "Blackout",
+  2: "Failed",
+  3: "Diff",
+  4: "Good",
+  5: "Easy",
+};
+
 export default function SrsCard() {
   const router = useRouter();
   const tenant = router.query.tenant as string;
@@ -19,45 +26,27 @@ export default function SrsCard() {
 
   const [showText, setShowText] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [previousWords, setPreviousWords] = useState<VocValue[]>([]);
-  const [currentWord, setCurrentWord] = useState<VocValue | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const {
-    data: words,
-    error: errorLoadingWords,
-    isLoading: isLoadingWords,
-  } = trpc.useQuery(["vocabulary.getForTenant", { tenant }]);
+    data: flashCards,
+    error: errorLoadingCards,
+    isLoading: isLoadingCards,
+  } = trpc.useQuery(["vocabulary.getFlashCardsToReview", { tenant, account }]);
 
-  const anotherRandomWord = (currentWord: VocValue) => {
-    setIsRevealed(false);
-    setPreviousWords((prevWords) => [currentWord, ...prevWords]);
-  };
+  if (errorLoadingCards) return <div>Error!</div>;
 
-  useEffect(() => {
-    if (words !== undefined) {
-      const randomVal = Math.floor(
-        (words.length - previousWords.length) * Math.random()
-      );
-      const newWord = words.filter((w) => !previousWords.includes(w))[
-        randomVal
-      ];
-      if (newWord === undefined) {
-        setPreviousWords([]);
-        setCurrentWord(null);
-      } else {
-        setCurrentWord(newWord);
-      }
-    }
-  }, [words, previousWords]);
+  console.log({ flashCards });
+  const currentCard = flashCards?.[currentIndex] ?? null;
 
-  if (errorLoadingWords) return <div>Error!</div>;
-
-  const translationsList = currentWord?.translations.map((t) => (
+  const translationsList = currentCard?.vocValue.translations.map((t) => (
     <div key={t.value}>{t.value}</div>
   ));
 
   const mainCardContents = translationsList;
-  const revealedContents = currentWord?.value;
+  const revealedContents = currentCard?.vocValue.value;
+
+  const reviewDone = () => currentIndex >= (flashCards?.length ?? 0);
 
   return (
     <div>
@@ -67,8 +56,9 @@ export default function SrsCard() {
           <Link href={`/${tenant}/words`}>
             <a className="underline text-blue-800">{tenant}</a>
           </Link>
-          . Total: {words?.length}. Covered: {previousWords.length}
+          . Total: {flashCards?.length}. Covered: {currentIndex}
         </span>
+
         <button
           className="border-black border-2"
           onClick={() => setShowText((prevValue) => !prevValue)}
@@ -76,7 +66,7 @@ export default function SrsCard() {
           {showText ? "Hide text" : "Show text"}
         </button>
       </h6>
-      {isLoadingWords || currentWord === null ? (
+      {isLoadingCards ? (
         <div>Spinner...</div>
       ) : (
         <div className="flex flex-col justify-center">
@@ -87,10 +77,10 @@ export default function SrsCard() {
             {showText ? (
               <div className="text-6xl">{mainCardContents}</div>
             ) : null}
-            {currentWord?.imageUrl ? (
+            {currentCard?.vocValue.imageUrl ? (
               <img
-                src={currentWord.imageUrl}
-                alt={currentWord.value}
+                src={currentCard.vocValue.imageUrl}
+                alt={currentCard.vocValue.value}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : null}
@@ -115,18 +105,35 @@ export default function SrsCard() {
                       console.log(val);
                     }}
                   >
-                    {val}
+                    {val + 1}
+                    <br />
+                    <span style={{ fontSize: 10 }}>
+                      {gradingTable[val + 1]}
+                    </span>
                   </button>
                 );
               })}
             </div>
           ) : null}
-          <button
-            onClick={() => anotherRandomWord(currentWord)}
-            className="border-green-800 border-2 m-4 h-20 fixed bottom-0 center w-11/12"
-          >
-            NEXT
-          </button>
+          {reviewDone() ? (
+            <div>DONE!</div>
+          ) : (
+            <button
+              onClick={() => {
+                setIsRevealed(false);
+
+                // TODO: Report score -> Add to attempts collection
+                // TODO: Run through SRS Algorithm
+                // TODO: Update FlashCard with CardState (bucket, eFactor and nextReviewDate)
+
+                setCurrentIndex((oldIndex) => oldIndex + 1);
+                if (reviewDone()) return;
+              }}
+              className="border-green-800 border-2 m-4 h-20 fixed bottom-0 center w-11/12"
+            >
+              NEXT
+            </button>
+          )}
         </div>
       )}
     </div>
