@@ -8,7 +8,7 @@ import {
   srsFunc,
 } from "../../srsLogic/srsAlgorithm";
 import addMinutes from "date-fns/addMinutes";
-import { getLatenessInDays, minutesFromDays } from "../../srsLogic/dateLogic";
+import { getLateness, minutesFromDays } from "../../srsLogic/dateLogic";
 
 export type FlashCardWithValue = Pick<
   FlashCard,
@@ -198,7 +198,7 @@ export const vocRouter = createRouter()
         });
 
       const now = new Date();
-      const lateness = getLatenessInDays(
+      const lateness = getLateness(
         previousState.nextReviewDate,
         previousState.interval,
         now
@@ -227,19 +227,14 @@ export const vocRouter = createRouter()
         },
       });
 
-      // TODO: Add an entry to the Attempts collection
-      // const result: FlashCard = await ctx.prisma.flashCard.create({
-      //   data: {
-      //     vocValueId: input.id,
-      //     account: input.account,
-      //     bucket: initialCardState.bucket,
-      //     eFactor: initialCardState.efactor,
-      //     interval: initialCardState.interval,
-      //     tenant: input.tenant,
-      //     isActive: true,
-      //     nextReviewDate: addMinutes(new Date(), 1),
-      //   },
-      // });
+      await ctx.prisma.reviewAttempt.create({
+        data: {
+          flashCardId: input.id,
+          dateReviewed: now,
+          lateness,
+          score: input.score,
+        },
+      });
 
       return { nextReviewDate: updatedFlashCardDate.nextReviewDate };
     },
