@@ -2,7 +2,7 @@ import { createRouter } from "./context";
 import { z } from "zod";
 import { FlashCard, Prisma, VocValue } from "@prisma/client";
 import { initialCardState } from "../../pages/[tenant]/srs/[account]/srsAlgorithm";
-import { addMinutes } from "date-fns";
+import addMinutes from "date-fns/addMinutes";
 
 export const vocRouter = createRouter()
   .mutation("add", {
