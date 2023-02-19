@@ -4,7 +4,8 @@ import {
   CardState,
   srsFunc,
   Evaluation,
-  defaultPrevious,
+  initialCardState,
+  daysFromMinutes,
 } from "./srsAlgorithm";
 
 const mockedRandom = () => 1;
@@ -33,7 +34,7 @@ test("results match the 'Typical' simulator", () => {
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -69,7 +70,7 @@ test("results match the 'Eventual Lapses' simulator", () => {
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -99,7 +100,7 @@ test("results match the 'Initially failed or just barely passed` simulator", () 
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -141,7 +142,7 @@ test("results match the 'Late but right' simulator", () => {
   const results = scoresWithLateness.reduce(
     (acc, currentValue) => [
       ...acc,
-      funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+      funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
     ],
     [null as CardState | null]
   );
@@ -180,7 +181,7 @@ test("results match the 'Reviewed too early' simulator", () => {
   const results = scoresWithLateness.reduce(
     (acc, currentValue) => [
       ...acc,
-      funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+      funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
     ],
     [null as CardState | null]
   );
@@ -216,7 +217,7 @@ test("results match the 'Initial reviews done late' simulator", () => {
   const results = scoresWithLateness.reduce(
     (acc, currentValue) => [
       ...acc,
-      funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+      funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
     ],
     [null as CardState | null]
   );
@@ -245,7 +246,7 @@ test("results match the '(All 3s)' simulator", () => {
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -274,7 +275,7 @@ test("results match the '(All 4s)' simulator", () => {
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -303,7 +304,7 @@ test("results match the 'Consistently failed` simulator", () => {
     .reduce(
       (acc, currentValue) => [
         ...acc,
-        funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+        funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
       ],
       [null as CardState | null]
     );
@@ -334,7 +335,7 @@ test("results match the 'Review done very early' simulator", () => {
   const results = scoresWithLateness.reduce(
     (acc, currentValue) => [
       ...acc,
-      funcUnderTest(acc[acc.length - 1] ?? defaultPrevious, currentValue),
+      funcUnderTest(acc[acc.length - 1] ?? initialCardState, currentValue),
     ],
     [null as CardState | null]
   );
@@ -358,4 +359,19 @@ test("results match the 'Review done very early' simulator", () => {
     "197d",
     "264d",
   ]);
+});
+
+test("first time review", () => {
+  const scoreWithLateness: Evaluation = {
+    score: 3,
+    lateness: daysFromMinutes(10),
+  };
+
+  const result = funcUnderTest(initialCardState, scoreWithLateness);
+
+  expect(result).toEqual({
+    bucket: 1,
+    efactor: 2.5,
+    interval: daysFromMinutes(1),
+  });
 });

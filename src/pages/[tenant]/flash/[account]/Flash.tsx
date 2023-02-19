@@ -2,26 +2,48 @@ import { VocValue } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../../../utils/trpc";
 
 export default function FlashCard() {
   const router = useRouter();
   const tenant = router.query.tenant as string;
+  const account = router.query.account as string;
 
   const [isInFlippedMode, setIsInFlippedMode] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [previousWords, setPreviousWords] = useState<VocValue[]>([]);
   const [currentWord, setCurrentWord] = useState<VocValue | null>(null);
+  const [isAddingToSrs, setIsAddingToSrs] = useState<boolean>(false);
+  const [flashCardInfo, setFlashCardInfo] = useState<string>("Add to SRS");
 
   const {
     data: words,
     error: errorLoadingWords,
     isLoading: isLoadingWords,
   } = trpc.useQuery(["vocabulary.getForTenant", { tenant }]);
+  const { mutateAsync: addToSrsMutation, isLoading: isSavingFlashCard } =
+    trpc.useMutation("vocabulary.addToSrs");
 
   const anotherRandomWord = (currentWord: VocValue) => {
     setIsRevealed(false);
     setPreviousWords((prevWords) => [currentWord, ...prevWords]);
+  };
+
+  const addToSrs = async (currentWord: VocValue, account: string) => {
+    setIsAddingToSrs(true);
+
+    try {
+      const flashCard = await addToSrsMutation({
+        id: currentWord.id,
+        tenant: currentWord.tenant,
+        account,
+      });
+      setFlashCardInfo(`Next review date: ${flashCard.nextReviewDate}`);
+    } catch (e) {
+      setFlashCardInfo(`Error: ${e}`);
+    }
+
+    setIsAddingToSrs(false);
   };
 
   useEffect(() => {
@@ -91,6 +113,16 @@ export default function FlashCard() {
           >
             NEXT
           </button>
+          {isAddingToSrs ? (
+            <div>Adding...</div>
+          ) : (
+            <button
+              onClick={() => addToSrs(currentWord, account)}
+              className="border-green-800 border-2 m-4 h-20"
+            >
+              {flashCardInfo}
+            </button>
+          )}
         </div>
       )}
     </div>

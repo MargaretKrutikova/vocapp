@@ -14,7 +14,7 @@ type VocItem {
 }
 
 model VocValue {
-    id           String    @id @default(auto()) @map("_id") @db.ObjectId
+    id           String      @id @default(auto()) @map("_id") @db.ObjectId
     tenant       String
     value        String
     language     String
@@ -24,4 +24,17 @@ model VocValue {
     usages       VocItem[]
     dateAdded    DateTime
     dateUpdated  DateTime?
+    FlashCard    FlashCard[]
+}
+
+model FlashCard {
+    vocValue       VocValue @relation(fields: [vocValueId], references: [id])
+    vocValueId     String   @id @map("_id") @db.ObjectId
+    bucket         Int
+    eFactor        Float
+    interval       Float
+    nextReviewDate DateTime
+    tenant         String
+    account        String
+    isActive       Boolean
 }
