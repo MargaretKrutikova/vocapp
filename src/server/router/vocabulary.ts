@@ -2,6 +2,7 @@ import { createRouter } from "./context";
 import { z } from "zod";
 import { FlashCard, Prisma, VocValue } from "@prisma/client";
 import { initialCardState } from "../../pages/[tenant]/srs/[account]/srsAlgorithm";
+import { addMinutes } from "date-fns";
 
 export const vocRouter = createRouter()
   .mutation("add", {
@@ -158,7 +159,7 @@ export const vocRouter = createRouter()
           interval: initialCardState.interval,
           tenant: input.tenant,
           isActive: true,
-          nextReviewDate: new Date(), // TODO: +1 minute
+          nextReviewDate: addMinutes(new Date(), 1),
         },
       });
 
