@@ -1,6 +1,7 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { Prisma, VocValue } from "@prisma/client";
+import { FlashCard, Prisma, VocValue } from "@prisma/client";
+import { initialCardState } from "../../pages/[tenant]/srs/[account]/srsAlgorithm";
 
 export const vocRouter = createRouter()
   .mutation("add", {
@@ -29,7 +30,7 @@ export const vocRouter = createRouter()
       },
       ctx,
     }) => {
-      const result = await ctx.prisma.vocValue.create({
+      const result: VocValue = await ctx.prisma.vocValue.create({
         data: {
           value,
           imageUrl,
@@ -127,5 +128,40 @@ export const vocRouter = createRouter()
       });
 
       return result[0];
+    },
+  })
+  .mutation("addToSrs", {
+    input: z.object({
+      id: z.string(),
+      tenant: z.string(),
+      account: z.string(),
+    }),
+    resolve: async ({
+      ctx,
+      input,
+    }): Promise<Pick<FlashCard, "nextReviewDate">> => {
+      const existingFlashCard = await ctx.prisma.flashCard.findUnique({
+        where: { vocValueId: input.id },
+        select: { nextReviewDate: true },
+      });
+
+      if (existingFlashCard !== null) {
+        return { nextReviewDate: existingFlashCard.nextReviewDate };
+      }
+
+      const result: FlashCard = await ctx.prisma.flashCard.create({
+        data: {
+          vocValueId: input.id,
+          account: input.account,
+          bucket: initialCardState.bucket,
+          eFactor: initialCardState.efactor,
+          interval: initialCardState.interval,
+          tenant: input.tenant,
+          isActive: true,
+          nextReviewDate: new Date(), // TODO: +1 minute
+        },
+      });
+
+      return { nextReviewDate: result.nextReviewDate };
     },
   });

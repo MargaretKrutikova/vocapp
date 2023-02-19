@@ -1,5 +1,5 @@
 export type CardState = {
-  n: number;
+  bucket: number;
   efactor: number;
   interval: number;
 };
@@ -47,25 +47,25 @@ function learningPhaseState(
   previousN: number,
   score: EvaluationScore,
   efactor: number
-) {
+): CardState {
   const incrementedN = previousN + 1;
   switch (score) {
     case 1:
     case 2:
       return {
-        n: 0,
+        bucket: 0,
         efactor,
         interval: daysFromMinutes(1.0),
       };
     case 3:
     case 4:
       return {
-        n: incrementedN,
+        bucket: incrementedN,
         efactor,
         interval: getFuzzInterval(incrementedN),
       };
     case 5:
-      return { n: incrementedN, efactor, interval: 4.0 };
+      return { bucket: incrementedN, efactor, interval: 4.0 };
   }
 }
 
@@ -106,22 +106,30 @@ function getInterval(
   }
 }
 
-export const defaultPrevious = { n: 0, efactor: 2.5, interval: 1.0 };
+export const initialCardState: CardState = {
+  bucket: 0,
+  efactor: 2.5,
+  interval: 1.0,
+};
 
 export function srsFunc(
   randomFunc: () => number,
   previous: CardState,
   evaluation: Evaluation
 ): CardState {
-  if (previous.n <= 2) {
+  if (previous.bucket <= 2) {
     // "Learning phase" - do not change efactor
-    return learningPhaseState(previous.n, evaluation.score, previous.efactor);
+    return learningPhaseState(
+      previous.bucket,
+      evaluation.score,
+      previous.efactor
+    );
   }
 
   // Reviewing phase - Failed
   if (evaluation.score < 3) {
     return {
-      n: 0,
+      bucket: 0,
       interval: daysFromMinutes(1), // Reset interval to 1 minute
       efactor: Math.max(1.3, previous.efactor - 0.2), // Reduce efactor
     };
@@ -145,7 +153,7 @@ export function srsFunc(
   );
 
   return {
-    n: previous.n + 1,
+    bucket: previous.bucket + 1,
     efactor: newEfactor,
     interval: newInterval + fuzzForInterval(newInterval, randomFunc),
   };

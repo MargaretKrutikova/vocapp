@@ -96,7 +96,7 @@ export default function Words() {
         <Link href={`/${tenant}/srs/kya`}>
           <a className="border-black border-2">SRS</a>
         </Link>
-        <Link href={`/${tenant}/flash`}>
+        <Link href={`/${tenant}/flash/kya`}>
           <a className="border-black border-2">Flash</a>
         </Link>
       </h6>
