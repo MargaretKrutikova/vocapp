@@ -38,3 +38,11 @@ model FlashCard {
     account        String
     isActive       Boolean
 }
+
+model ReviewAttempt {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    flashCardId  String
+    dateReviewed DateTime
+    score        Int
+    lateness     Float
+}
