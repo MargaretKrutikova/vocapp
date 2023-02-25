@@ -2,6 +2,7 @@ import { VocItem, VocValue } from "@prisma/client";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { TextField } from "./TextField";
+import { AddToSrsButton } from "./AddToSrsButton";
 
 type Props = {
   words: VocValue[];
@@ -36,6 +37,7 @@ const filterWords = (wordsToFilter: VocValue[], searchQuery: string) => {
 export default function WordsList({ words, isDisabled }: Props) {
   const router = useRouter();
   const tenant = router.query.tenant as string;
+  const account = router.query.account as string;
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -59,6 +61,9 @@ export default function WordsList({ words, isDisabled }: Props) {
               >
                 ✎
               </button>
+              {isDisabled ? null : (
+                <AddToSrsButton id={w.id} account={account} tenant={tenant} />
+              )}
             </div>
             <div className="text-lg">
               {w.translations.map((t) => (

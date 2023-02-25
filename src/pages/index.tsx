@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useState } from "react";
 
 type TechnologyCardProps = {
   name: string;
@@ -8,6 +9,8 @@ type TechnologyCardProps = {
 };
 
 const Home: NextPage = () => {
+  const [account, setAccount] = useState("kya");
+
   return (
     <>
       <Head>
@@ -24,13 +27,22 @@ const Home: NextPage = () => {
           <span className="text-purple-300">Voc</span> App
         </h1>
         <p className="text-2xl text-gray-700">Test URLs:</p>
+        <input
+          type="text"
+          value={account}
+          onChange={(e) => setAccount(e.target.value)}
+        />
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
           <TechnologyCard
             name="spanish"
             description="Spanish"
-            link="spanish/words"
+            link={`spanish/words/${account}`}
           />
-          <TechnologyCard name="test" description="Test" link="test/words" />
+          <TechnologyCard
+            name="test"
+            description="Test"
+            link={`test/words/${account}`}
+          />
         </div>
       </main>
     </>
