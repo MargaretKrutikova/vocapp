@@ -97,6 +97,9 @@ export default function Words() {
         <Link href={`/${tenant}/srs/${account}`}>
           <a className="border-black border-2">SRS</a>
         </Link>
+        <Link href={`/${tenant}/srs/${account}/cards`}>
+          <a className="border-black border-2">SRS Cards</a>
+        </Link>
         <Link href={`/${tenant}/flash/${account}`}>
           <a className="border-black border-2">Flash</a>
         </Link>

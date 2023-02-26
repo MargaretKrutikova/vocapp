@@ -56,7 +56,7 @@ export default function WordsList({ words, isDisabled }: Props) {
                 className="px-4"
                 disabled={isDisabled}
                 onClick={() => {
-                  router.push(`/${tenant}/${w.id}`);
+                  router.push(`/${tenant}/${w.id}/${account}`);
                 }}
               >
                 ✎

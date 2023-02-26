@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
-import { mapLanguageValues } from "../../../languages";
-import { trpc } from "../../../utils/trpc";
-import { useWordForm } from "../../../hooks/useWordForm";
-import { WordForm } from "../../../components/WordForm";
+import { mapLanguageValues } from "../../../../languages";
+import { trpc } from "../../../../utils/trpc";
+import { useWordForm } from "../../../../hooks/useWordForm";
+import { WordForm } from "../../../../components/WordForm";
 
 export default function EditWord() {
   const router = useRouter();
   const id = router.query.id as string;
+  const account = router.query.account as string;
 
   const {
     data: word,
@@ -18,7 +19,7 @@ export default function EditWord() {
     trpc.useMutation(["vocabulary.edit"], {
       onSuccess: () => {
         if (typeof window !== "undefined" && word) {
-          router.push(`/${word.tenant}/words`);
+          router.push(`/${word.tenant}/words/${account}`);
         }
       },
     });

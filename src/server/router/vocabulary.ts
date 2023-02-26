@@ -1,6 +1,6 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { FlashCard, VocValue } from "@prisma/client";
+import { FlashCard, ReviewAttempt, VocValue } from "@prisma/client";
 import {
   CardState,
   EvaluationScore,
@@ -12,7 +12,7 @@ import { getLateness, minutesFromDays } from "../../srsLogic/dateLogic";
 
 export type FlashCardWithValue = Pick<
   FlashCard,
-  "vocValueId" | "nextReviewDate"
+  "vocValueId" | "nextReviewDate" | "bucket"
 > & {
   vocValue: VocValue;
 };
@@ -134,10 +134,53 @@ export const vocRouter = createRouter()
             nextReviewDate: { lte: new Date() },
           },
           orderBy: { nextReviewDate: "asc" },
-          select: { vocValueId: true, vocValue: true, nextReviewDate: true },
+          select: {
+            vocValueId: true,
+            vocValue: true,
+            nextReviewDate: true,
+            bucket: true,
+          },
         });
 
       return flashCardsToReview;
+    },
+  })
+  .query("getFlashCards", {
+    input: z.object({
+      tenant: z.string(),
+      account: z.string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      const flashCards: Array<FlashCardWithValue> =
+        await ctx.prisma.flashCard.findMany({
+          where: {
+            tenant: input.tenant,
+            account: input.account,
+          },
+          orderBy: { nextReviewDate: "asc" },
+          select: {
+            vocValueId: true,
+            bucket: true,
+            nextReviewDate: true,
+            vocValue: true,
+          },
+        });
+
+      return flashCards;
+    },
+  })
+  .query("getReviewAttempts", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      const reviewAttempts: Array<ReviewAttempt> =
+        await ctx.prisma.reviewAttempt.findMany({
+          where: { flashCardId: input.id },
+          orderBy: { dateReviewed: "asc" },
+        });
+
+      return reviewAttempts;
     },
   })
   .mutation("addToSrs", {
