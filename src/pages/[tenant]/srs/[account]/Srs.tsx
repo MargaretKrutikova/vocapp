@@ -134,6 +134,7 @@ export default function SrsCard() {
                 })
                   .then((_res) => {
                     setIsRevealed(false);
+                    setScore(null);
                     setCurrentIndex((oldIndex) => oldIndex + 1);
                   })
                   .catch((err) => {
