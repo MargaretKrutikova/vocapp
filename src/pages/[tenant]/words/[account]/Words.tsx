@@ -15,6 +15,8 @@ export default function Words() {
   const tenant = router.query.tenant as string;
   const account = router.query.account as string;
 
+  console.log({ tenant, account, q: router.query });
+
   const queryClient = useQueryClient();
   const queryName = "vocabulary.getForTenant";
   const queryKey = [queryName, { tenant }];

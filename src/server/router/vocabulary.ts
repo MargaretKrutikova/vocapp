@@ -105,9 +105,13 @@ export const vocRouter = createRouter()
       tenant: z.string(),
     }),
     resolve: async ({ ctx, input }) => {
-      return await ctx.prisma.vocValue.findMany({
-        where: { tenant: input.tenant },
-      });
+      try {
+        return await ctx.prisma.vocValue.findMany({
+          where: { tenant: input.tenant },
+        });
+      } catch (e) {
+        console.log("Error in getForTenant: ", { e });
+      }
     },
   })
   .query("getById", {
