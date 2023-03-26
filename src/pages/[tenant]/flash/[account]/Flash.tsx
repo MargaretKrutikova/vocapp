@@ -81,7 +81,7 @@ export default function FlashCard() {
       <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
         <span>
           Flashcards for{" "}
-          <Link href={`/${tenant}/words`}>
+          <Link href={`/${tenant}/words/${account}`}>
             <a className="underline text-blue-800">{tenant}</a>
           </Link>
           . Total: {words?.length}. Covered: {previousWords.length}

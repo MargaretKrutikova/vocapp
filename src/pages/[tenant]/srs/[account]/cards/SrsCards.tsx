@@ -21,7 +21,7 @@ export default function SrsCards() {
       <h6 className="text-xl md:text-[1rem] leading-normal font-extrabold text-gray-700 flex justify-between">
         <span>
           SRS FlashCards for {account} in{" "}
-          <Link href={`/${tenant}/words/${tenant}`}>
+          <Link href={`/${tenant}/words/${account}`}>
             <a className="underline text-blue-800">{tenant}</a>
           </Link>
           . Total: {flashCards?.length}.
