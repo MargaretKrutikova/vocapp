@@ -90,14 +90,14 @@ export default function SrsCard() {
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : null}
-            <div className="flex flex-col">
-              {isRevealed ? (
-                <>
-                  <div>{revealedContents}</div>
-                </>
-              ) : null}
-            </div>
           </button>
+          <div className="flex flex-col align-middle">
+            {isRevealed ? (
+              <>
+                <div>{revealedContents}</div>
+              </>
+            ) : null}
+          </div>
           <br />
 
           {isRevealed ? (
