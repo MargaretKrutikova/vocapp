@@ -91,10 +91,10 @@ export default function SrsCard() {
               />
             ) : null}
           </button>
-          <div className="flex flex-col align-middle">
+          <div className="flex flex-col items-center">
             {isRevealed ? (
               <>
-                <div>{revealedContents}</div>
+                <div className="text-3xl">{revealedContents}</div>
               </>
             ) : null}
           </div>
